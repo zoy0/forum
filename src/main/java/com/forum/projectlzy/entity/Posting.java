@@ -17,7 +17,7 @@ public class Posting {
     /**
      * 表中帖子id
      */
-    private int id;
+    private Integer id;
 
     /**
      * 发布者账号
@@ -33,7 +33,7 @@ public class Posting {
      * 帖子状态
      * 0 表示被隐藏, 1表示正常
      */
-    private int state;
+    private Integer state;
 
     /**
      * 帖子标题
@@ -53,11 +53,11 @@ public class Posting {
     /**
      * 收藏人数
      */
-    private int favoriteNumber;
+    private Integer favoriteNumber;
 
     /**
      * 帖子类型
      * 0 表示文字类型, 1表示视频类型
      */
-    private int type;
+    private Integer type;
 }

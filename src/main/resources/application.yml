@@ -1,0 +1,20 @@
+# 应用名称
+spring:
+  application:
+    name: project-lzy
+    # datesource
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    url: jdbc:mysql:///forum?serverTimezone=Asia/Shanghai&allowMultiQueries=true
+    type: com.alibaba.druid.pool.DruidDataSource
+    password: 615120
+# 应用服务 WEB 访问端口
+server:
+  port: 8080
+
+# mybatis
+mybatis:
+  mapper-locations: classpath*:mappers/*.xml
+  configuration:
+    map-underscore-to-camel-case: true

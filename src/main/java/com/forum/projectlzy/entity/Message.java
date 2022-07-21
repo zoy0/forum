@@ -17,12 +17,12 @@ public class Message {
     /**
      * 表中留言id
      */
-    private int id;
+    private Integer id;
 
     /**
      * 留言帖子的id
      */
-    private int postingId;
+    private Integer postingId;
 
     /**
      * 留言的发布者
@@ -32,7 +32,7 @@ public class Message {
     /**
      * 所在楼数
      */
-    private int threadNumber;
+    private Integer threadNumber;
 
     /**
      * 发布时间
