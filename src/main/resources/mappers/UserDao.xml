@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.forum.projectlzy.dao.UserDao">
-    <resultMap id="UserEntityResultMap" type="com.forum.projectlzy.dao.UserDao">
+    <resultMap id="UserEntityResultMap" type="com.forum.projectlzy.entity.User">
         <id property="id" column="id"/>
         <result property="userName" column="username"/>
         <result property="passWord" column="password"/>
@@ -13,10 +13,18 @@
         <result property="admin" column="admin"/>
     </resultMap>
 
-    <insert id="insertByEntity"  parameterType="com.forum.projectlzy.entity.User" useGeneratedKeys="true"
+    <insert id="insertByMap" parameterType="Map" useGeneratedKeys="true"
             keyProperty="id">
-            insert into user_table values (null,#{userName},#{passWord},null,null,null,null)
+        insert into user_table
+        values (null, #{userName}, #{passWord}, null, #{email}, null, null)
     </insert>
+
+    <select id="findByUserName" resultMap="UserEntityResultMap">
+        select * from user_table
+        <where>
+            username=#{userName}
+        </where>
+    </select>
 
 
 </mapper>

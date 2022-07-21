@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
  * 结果集返回对象
  */
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResultDto {

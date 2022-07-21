@@ -2,6 +2,7 @@ package com.forum.projectlzy.dao;
 
 import com.forum.projectlzy.entity.User;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,6 +18,6 @@ public interface UserDao extends BaseDao<User> {
      * @param username 用户名
      * @return
      */
-    List<User> findByUserName(String username);
+    List<User> findByUserName(@Param("userName")String username);
 
 }

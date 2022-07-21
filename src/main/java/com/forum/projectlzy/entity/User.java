@@ -1,5 +1,6 @@
 package com.forum.projectlzy.entity;
 
+import com.forum.projectlzy.utils.EncryptUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -52,5 +53,13 @@ public class User {
      * 1 表示管理员, 0 表示普通用户
      */
     private Integer admin;
+
+    public static String encryptPassword(String passWord){
+        return EncryptUtil.md5Encrypt(passWord);
+    }
+
+    public static String decryptPassword(String passWord){
+        return EncryptUtil.rsaDecrypt(passWord);
+    }
 
 }
