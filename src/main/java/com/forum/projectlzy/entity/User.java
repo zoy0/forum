@@ -54,12 +54,34 @@ public class User {
      */
     private Integer admin;
 
-    public static String encryptPassword(String passWord){
+    /**
+     * md5加密
+     * @param passWord 密码明文
+     * @return 加密后字符串
+     */
+    public static String encryptPassword(String passWord) {
         return EncryptUtil.md5Encrypt(passWord);
     }
 
-    public static String decryptPassword(String passWord){
+    /**
+     * rsa解密
+     * @param passWord 加密密码
+     * @return 明文
+     */
+    public static String decryptPassword(String passWord) {
         return EncryptUtil.rsaDecrypt(passWord);
+    }
+
+    /**
+     * 传进一个明文密码，与user对象中加密过的密码进行比较
+     * @param passWord 明文
+     * @return
+     */
+    public boolean comparePassWord(String passWord) {
+        if (this.passWord == null) {
+            return false;
+        }
+        return this.passWord.equals(encryptPassword(passWord));
     }
 
 }

@@ -18,4 +18,12 @@ public interface UserService {
      * @return
      */
     ResultDto regist(String username, String password, String email);
+
+    /**
+     * 用户登录
+     * @param username 用户名
+     * @param password 密码
+     * @return
+     */
+    ResultDto login(String username, String password,boolean admin);
 }

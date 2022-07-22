@@ -21,6 +21,9 @@ public class UserController {
     /**
      * 用户注册
      *
+     * @param username 用户名
+     * @param password 密码
+     * @param email    邮箱地址
      * @return
      */
     @PostMapping("/regist")
@@ -29,6 +32,21 @@ public class UserController {
                               String email) {
         password = User.decryptPassword(password);
         return userService.regist(username, password, email);
+    }
+
+    /**
+     * 用户登录
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @return
+     */
+    @PostMapping("/login")
+    public ResultDto login(String username,
+                           String password,
+                           boolean admin) {
+        password = User.decryptPassword(password);
+        return userService.login(username, password,admin);
     }
 
 }

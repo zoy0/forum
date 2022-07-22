@@ -16,22 +16,20 @@
 
 <div id="app">
     <el-form ref="form" :model="form" :rules="rules" class="login-box">
-        <h3 class="login-title">注册页面</h3>
+        <h3 class="login-title">欢迎登录</h3>
         <el-form-item label="账号" prop="name">
             <el-input type="text" placeholder="请输入用户名" v-model="form.name"></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
             <el-input type="password" placeholder="请输入密码" v-model="form.password"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-            <el-input type="text" placeholder="请输入邮箱地址" v-model="form.email"></el-input>
-        </el-form-item>
-        <el-link type="primary" href="demo.html">返回登录</el-link>
+        <el-link type="primary" href="regist.html">立即注册</el-link>
+
         <!-- <el-form-item>
-            <el-button type="primary" @click="submitForm('form')">注册</el-button>
+            <el-button type="primary" @click="submitForm('form')">登录</el-button>
         </el-form-item> -->
         <el-form-item>
-            <el-button type="primary" @click="submit">注册</el-button>
+            <el-button type="primary" @click="submit">登录</el-button>
         </el-form-item>
     </el-form>
 </div>
@@ -44,28 +42,39 @@
         },
 
         methods: {
+            // open() {
+            //     this.$alert('这是一段内容', '注册成功', {
+            //         confirmButtonText: '确定',
+            //         // callback: action => {
+            //         //     this.$message({
+            //         //         type: 'info',
+            //         //         message: `action: ${action}`
+            //         //     });
+            //         // }
+            //     });
+            // },
 
             submit() {
 
                 let formData = new FormData();
-                formData.append('username',this.form.name);
-                formData.append('password',encryptData(this.form.password));
-                formData.append('email',this.form.email);
+                formData.append('username', this.form.name);
+                formData.append('password', encryptData(this.form.password));
+                formData.append('admin', false);
                 axios({
                     method: "post",
-                    url: "/user/regist",
+                    url: "/user/login",
                     headers: {
                         "Content-Type": "multipart/form-data"
                     },
-                    withCredentials:true,
-                    data:formData
+                    withCredentials: true,
+                    data: formData
                 }).then(resp => {
                     this.$alert(null, resp.data.message, {
                         dangerouslyUseHTMLString: true,
                         confirmButtonText: '确定',
                         callback: action => {
-                            if (resp.data.data == true)
-                                window.location.href = "demo.html";
+                            // if (resp.data.data == true)
+                            //     window.location.href = "login.html";
                         }
                     });
                 })
@@ -77,8 +86,7 @@
             return {
                 form: {
                     name: '',
-                    password: '',
-                    email: ''
+                    password: ''
                 },
                 rules: {
                     name: [{
@@ -94,6 +102,7 @@
                 }
             }
         }
+
     })
 
 </script>
