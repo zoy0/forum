@@ -16,7 +16,7 @@
     <insert id="insertByMap" parameterType="Map" useGeneratedKeys="true"
             keyProperty="id">
         insert into user_table
-        values (null, #{userName}, #{passWord}, null, #{email}, null, null)
+        values (null, #{userName}, #{passWord}, #{createdTime}, #{email}, 1, 0)
     </insert>
 
     <select id="findByUserName" resultMap="UserEntityResultMap">
