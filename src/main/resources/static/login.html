@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Document</title>
+    <title>用户登录</title>
     <script src="js/vue.js"></script>
     <script src="element-ui/lib/index.js"></script>
     <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
@@ -69,14 +69,21 @@
                     withCredentials: true,
                     data: formData
                 }).then(resp => {
-                    this.$alert(null, resp.data.message, {
-                        dangerouslyUseHTMLString: true,
-                        confirmButtonText: '确定',
-                        callback: action => {
-                            // if (resp.data.data == true)
-                            //     window.location.href = "login.html";
-                        }
-                    });
+                    this.$message.error(resp.data.message);
+                    if (resp.data.data == false) {
+                        this.$message.error(resp.data.message);
+                    } else {
+                        window.location.href = "index.html";
+                    }
+
+                    // this.$alert(null, resp.data.message, {
+                    //     dangerouslyUseHTMLString: true,
+                    //     confirmButtonText: '确定',
+                    //     callback: action => {
+                    //         // if (resp.data.data == true)
+                    //         //     window.location.href = "login.html";
+                    //     }
+                    // });
                 })
             }
 
