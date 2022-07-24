@@ -43,7 +43,7 @@ public class Posting {
     /**
      * 正文
      */
-    private String context;
+    private String content;
 
     /**
      * 最后回复时间

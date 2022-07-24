@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>帖子</title>
+
+    <link rel="stylesheet" href="highlight/styles/monokai-sublime.min.css">
+    <script src="highlight/highlight.min.js"></script>
+    <script src="js/my.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+    <script src="js/axios-0.18.0.js"></script>
+</head>
+
+<body>
+
+
+    <div id="app">
+
+        <div>
+            <el-card class="box-card" style="width: 50% ; margin-bottom: 30px">
+                <h4 style="color:rgb(104, 80, 80)">{{posting.publisher}}:</h4>
+                <p style="color:rgb(150, 125, 125)">{{posting.publishTime}}</p>
+                <h2>{{posting.title}}</h2>
+                <strong v-html="posting.content"></strong>
+            </el-card>
+        </div>
+
+        <div>
+            <el-row>
+                <el-col v-for="(item ,index) in message" :key="item.threadNumber" :offset="1">
+                    <el-card class="box-card" style="width: 40%;">
+                        <h4> {{item.publisher}}: </h4>
+                        <p>{{item.publishTime}}</p>
+                        <p>第{{item.threadNumber}}楼</p>
+                        <strong v-html="item.content"></strong><br>
+                        <el-link type="primary" v-if="item.black!=0" @click="view(index)">查看全部回复</el-link>
+                    </el-card>
+
+                </el-col>
+            </el-row>
+        </div>
+
+
+
+        <!-- 回复对话框 -->
+        <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
+            <el-card class="box-card" style="width: 90%; margin-bottom: 30px;">
+                <h4> {{message[this.viewThreadNumbe].publisher}}: </h4>
+                <p>{{message[this.viewThreadNumbe].publishTime}}</p>
+                <p>第{{viewThreadNumbe}}楼</p>
+                <strong v-html="message[this.viewThreadNumbe].content"></strong><br>
+            </el-card>
+
+            <div v-for="item in message[this.viewThreadNumbe].back" :key="item.index" :offset="1">
+                <div style="margin-bottom: 10px">
+                    <span>{{item.publisher}}</span>
+                    <span>({{item.publishTime}}):</span>
+                </div>
+                <strong >{{item.content}}</strong>
+                <el-divider></el-divider>
+            </div>
+
+            <span slot="footer" class="dialog-footer">
+
+                <el-button @click="dialogVisible = false">收起</el-button>
+            </span>
+        </el-dialog>
+
+
+
+    </div>
+
+
+
+    <script>
+
+
+        new Vue({
+            el: "#app",
+
+            mounted() {
+                hljs.initHighlightingOnLoad();
+            },
+
+            methods: {
+
+
+
+                view(threadNumber) {
+                    // TODO axaj查询
+                    this.viewThreadNumbe = threadNumber;
+                    this.dialogVisible = true;
+
+                },
+
+                show() {
+                    console.log(getQueryVariable("id"));
+                },
+
+            },
+
+            data() {
+                return {
+                    dialogVisible: false,
+                    viewThreadNumbe: 0,
+                    posting: {
+                        publisher: "admin",
+                        publishTime: "2022-3-9",
+                        title: "标题：夕阳无限好",
+                        content: "以下是帖子正文： <pre><code style=\"width:70%  \"> public boolean comparePassWord(String passWord) {\n        if (this.passWord == null) {\n            return false;\n        }\n        return this.passWord.equals(encryptPassword(passWord));\n  </code></pre> <img src=\"https://s3.bmp.ovh/imgs/2022/07/16/0c59564969d97665.png\" style=\"width: 500px \"></img>"
+                        // content: "众所周知，<pre><code>&lt;html&gt;\n\n&lt;head&gt;\n  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;\n&lt;/script&gt;\n&lt;/head&gt;\n\n&lt;body&gt;\n\n  &lt;script type=&quot;text/javascript&quot;&gt;\n    xmlDoc=<a href=\"dom_loadxmldoc.asp\">loadXMLDoc</a>(&quot;books.xml&quot;);\n    document.write(&quot;xmlDoc is loaded, ready for use&quot;);\n  &lt;/script&gt;\n\n&lt;/body&gt;\n\n&lt;/html&gt;</code></pre>这个真是一个强大的功能 ",
+                    },
+                    message: [{
+                        publisher: "阿瞒",
+                        publishTime: "2022-3-9",
+                        threadNumber: "1",
+                        content: "正是如此",
+                        black: 0,
+                        back: [{
+                            publisher: "",
+                            publishTime: "",
+                            content: "",
+                        }],
+                    },
+                    {
+                        publisher: "zy233",
+                        publishTime: "2022-3-10",
+                        threadNumber: "2",
+                        content: "补充一下,<pre> <code class=\"java\"> ResultDto login(String username, String password,boolean admin); </code> </pre>",
+                        black: 1,
+                        back: [{
+                            publisher: "admin",
+                            publishTime: "2022-10-11",
+                            content: "好的，谢谢！",
+                        }],
+                    },
+                    {
+                        publisher: "zy233",
+                        publishTime: "2022-3-10",
+                        threadNumber: "3",
+                        content: "还有以下几点<img src=\"https://s3.bmp.ovh/imgs/2022/07/16/7e82f0c970a591fa.png\" style=\"width: 500px \"></img>",
+                        black: 2,
+                        back: [{
+                            publisher: "zy233",
+                            publishTime: "2022-3-10",
+                            content: "万名之",
+                        },
+                        {
+                            publisher: "admin",
+                            publishTime: "2022-3-11",
+                            content: "thanks",
+                        }],
+                    },]
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

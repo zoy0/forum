@@ -73,6 +73,7 @@
                     if (resp.data.data == false) {
                         this.$message.error(resp.data.message);
                     } else {
+                        document.cookie="token="+resp.data.data+";HttpOnly";
                         window.location.href = "index.html";
                     }
 

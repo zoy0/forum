@@ -10,6 +10,17 @@ import java.util.Map;
 public interface BaseDao<T> {
 
     /**
+     * 升序关键字
+     */
+    public static final String ASC_SORT="ASC";
+
+    /**
+     * 降序关键字
+     */
+    public static final String DESC_SORT="DESC";
+
+
+    /**
      * 根据实体类进行插入
      * @param t 带有即将插入的参数的实体类
      * @return 影响行数
