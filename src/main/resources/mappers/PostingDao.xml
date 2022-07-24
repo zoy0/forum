@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.forum.projectlzy.dao.PostingDao">
+
+    <resultMap id="Posting" type="com.forum.projectlzy.entity.Posting">
+        <id property="id" column="id"/>
+        <result property="publisher" column="publisher"/>
+        <result property="publishTime" column="publish_time"/>
+        <result property="state" column="state"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
+        <result property="lastReplyTime" column="last_reply_time"/>
+        <result property="favoriteNumber" column="favorite_number"/>
+        <result property="type" column="type"/>
+    </resultMap>
+
+
+    <select id="findByPageAndSort" resultMap="Posting">
+        select title ,content ,publish_time ,last_reply_time from posting
+        <where>
+            <if test="search != null and search !=''">
+                (title like "%"#{search}"%" or content like "%"#{search}"%")
+            </if>
+        </where>
+        <if test="sortRule !=null and sortPropertyName!=null">
+            order by ${sortPropertyName} ${sortRule}
+        </if>
+        <if test="pageNumber !=null and limitNumber !=null">
+            limit ${pageNumber} ,${limitNumber}
+        </if>
+    </select>
+
+    <select id="countBySearch" resultType="java.lang.Integer">
+        select count(*) from posting
+        <where>
+            <if test="search != null and search !=''">
+                (title like "%"#{search}"%" or content like "%"#{search}"%")
+            </if>
+        </where>
+    </select>
+
+</mapper>
