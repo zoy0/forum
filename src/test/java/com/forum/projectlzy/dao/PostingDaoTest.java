@@ -19,10 +19,12 @@ class PostingDaoTest {
 
     @Test
     void findByPageAndSort() {
-        List<Posting> list1 = dao.findByPageAndSort(search,0,10,dao.ASC_SORT,"publish_time");
-        List<Posting> list2 = dao.findByPageAndSort(search,0,10,dao.DESC_SORT,"publish_time");
+        Posting posting = new Posting();
+        posting.setState(1);
+        List<Posting> list1 = dao.findByPageAndSort(search,posting,0,10,dao.ASC_SORT,"publish_time");
+//        List<Posting> list2 = dao.findByPageAndSort(search,null,0,10,dao.DESC_SORT,"publish_time");
         System.out.println(list1);
-        System.out.println(list2);
+//        System.out.println(list2);
     }
 
     @Test

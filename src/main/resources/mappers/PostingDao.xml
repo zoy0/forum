@@ -21,7 +21,22 @@
         select title ,content ,publish_time ,last_reply_time from posting
         <where>
             <if test="search != null and search !=''">
-                (title like "%"#{search}"%" or content like "%"#{search}"%")
+                (title like "%"#{search}"%" or content like "%"#{search}"%" or publisher like "%"#{search}"%")
+            </if>
+            <if test="posting.id !=null">
+                and id = #{posting.id}
+            </if>
+            <if test="posting.publisher !=null">
+                and publisher=#{posting.publisher}
+            </if>
+            <if test="posting.state !=null">
+                and state=#{posting.state}
+            </if>
+            <if test="posting.title !=null">
+                and title=#{posting.title}
+            </if>
+            <if test="posting.type !=null">
+                and type=#{posting.type}
             </if>
         </where>
         <if test="sortRule !=null and sortPropertyName!=null">

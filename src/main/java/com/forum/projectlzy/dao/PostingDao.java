@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface PostingDao extends BaseDao<Posting> {
@@ -21,6 +22,7 @@ public interface PostingDao extends BaseDao<Posting> {
      * @return
      */
     List<Posting> findByPageAndSort(@Param("search") String search,
+                                    @Param("posting") Posting posting,
                                     @Param("pageNumber") Integer pageNumber,
                                     @Param("limitNumber") Integer limitNumber,
                                     @Param("sortRule") String sortRule,
