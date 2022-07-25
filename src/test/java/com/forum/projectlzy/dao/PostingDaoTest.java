@@ -29,7 +29,7 @@ class PostingDaoTest {
 
     @Test
     void countBySearch() {
-        Integer count = dao.countBySearch(search);
+        Integer count = dao.countBySearch(search,0);
         System.out.println(count);
     }
 }

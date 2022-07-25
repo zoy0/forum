@@ -16,4 +16,5 @@ public class PageResult<T> {
     private Integer totalNumber;
 
     private List<T> list;
+
 }

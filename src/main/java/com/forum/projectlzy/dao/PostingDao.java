@@ -28,6 +28,6 @@ public interface PostingDao extends BaseDao<Posting> {
                                     @Param("sortRule") String sortRule,
                                     @Param("sortPropertyName") String sortPropertyName);
 
-    Integer countBySearch(@Param("search") String search);
+    Integer countBySearch(@Param("search") String search, @Param("type") Integer type);
 
 }
