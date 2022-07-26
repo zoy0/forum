@@ -24,3 +24,16 @@ mybatis:
 #      forum:
 #        projectlzy:
 #          dao: debug
+
+ftp:
+  address: 192.168.1.8
+  port: 21
+  username: june
+  password: 615120yan
+  encoding: utf-8
+  basePath: /home/june/forum
+ftpPool:
+  maxIdle: 10
+  minIdle: 5
+  maxTotal: 15
+  maxWaitMillis: 300000
