@@ -59,13 +59,16 @@ public class FtpClientFactory implements PooledObjectFactory<FTPClient> {
      */
     @Override
     public PooledObject<FTPClient> makeObject() throws Exception {
+//        FTPClient ftpClient = new FTPClient();
+//        ftpClient.connect(FTP_ADDRESS, FTP_PORT);
+//        ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
+//        ftpClient.setControlEncoding(FTP_ENCODING);
+//        ftpClient.makeDirectory(FTP_BASE_PATH);
+//        ftpClient.changeWorkingDirectory(FTP_BASE_PATH);
+//        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+//        return new DefaultPooledObject<>(ftpClient);
+        //创建客户端实例
         FTPClient ftpClient = new FTPClient();
-        ftpClient.connect(FTP_ADDRESS, FTP_PORT);
-        ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
-        ftpClient.setControlEncoding(FTP_ENCODING);
-        ftpClient.makeDirectory(FTP_BASE_PATH);
-        ftpClient.changeWorkingDirectory(FTP_BASE_PATH);
-        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         return new DefaultPooledObject<>(ftpClient);
     }
 
@@ -108,7 +111,13 @@ public class FtpClientFactory implements PooledObjectFactory<FTPClient> {
      */
     @Override
     public void activateObject(PooledObject<FTPClient> pooledObject) throws Exception {
-
+        FTPClient ftpClient = pooledObject.getObject();
+        ftpClient.connect(FTP_ADDRESS, FTP_PORT);
+        ftpClient.login(FTP_USERNAME, FTP_PASSWORD);
+        ftpClient.setControlEncoding(FTP_ENCODING);
+        ftpClient.makeDirectory(FTP_BASE_PATH);
+        ftpClient.changeWorkingDirectory(FTP_BASE_PATH);
+        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
     }
 
     /**
@@ -116,6 +125,15 @@ public class FtpClientFactory implements PooledObjectFactory<FTPClient> {
      */
     @Override
     public void passivateObject(PooledObject<FTPClient> pooledObject) throws Exception {
-
+        FTPClient ftpClient = pooledObject.getObject();
+        try {
+            ftpClient.changeWorkingDirectory("/");
+            ftpClient.logout();
+            if (ftpClient.isConnected()) {
+                ftpClient.disconnect();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

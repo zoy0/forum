@@ -2,6 +2,8 @@ package com.forum.projectlzy.utils.ftp;
 
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPClientConfig;
+import org.apache.commons.net.ftp.FTPFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -9,7 +11,9 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * ftp工具类
@@ -51,6 +55,7 @@ public class FtpUtils {
             ftp.makeDirectory(ftpBasePath + path);
             //存储文件
             ftp.changeWorkingDirectory(ftpBasePath + path);
+            ftp.enterLocalPassiveMode();
             map.forEach((fileName, inputStream) -> {
                 try {
                     ftp.storeFile(fileName, inputStream);
@@ -58,6 +63,7 @@ public class FtpUtils {
                     e.printStackTrace();
                 }
             });
+            ftp.enterLocalActiveMode();
             ftpPool.returnFtpClient(ftp);
         } catch (IOException e) {
             e.printStackTrace();
@@ -74,7 +80,9 @@ public class FtpUtils {
         InputStream inputStream = null;
         try {
             FTPClient ftpClient = ftpPool.getFtpClient();
+            ftpClient.configure(new FTPClientConfig(FTPClientConfig.SYST_UNIX));
             ftpClient.changeWorkingDirectory(ftpBasePath + path);
+            ftpClient.enterLocalPassiveMode();
             inputStream = ftpClient.retrieveFileStream(fileName);
             ftpPool.returnFtpClient(ftpClient);
         } catch (IOException e) {
