@@ -8,12 +8,12 @@
         <id property="id" column="id"/>
         <result property="publisher" column="publisher"/>
         <result property="publishTime" column="publish_time"/>
-        <result property="state" column="state"/>
+        <result property="postingState" column="state"/>
         <result property="title" column="title"/>
         <result property="content" column="content"/>
         <result property="lastReplyTime" column="last_reply_time"/>
         <result property="favoriteNumber" column="favorite_number"/>
-        <result property="type" column="type"/>
+        <result property="postingType" column="type"/>
     </resultMap>
 
 
@@ -29,14 +29,14 @@
             <if test="posting.publisher !=null">
                 and publisher=#{posting.publisher}
             </if>
-            <if test="posting.state !=null">
-                and state=#{posting.state}
+            <if test="posting.postingState !=null">
+                and state=#{posting.postingState}
             </if>
             <if test="posting.title !=null">
                 and title=#{posting.title}
             </if>
-            <if test="posting.type !=null">
-                and type=#{posting.type}
+            <if test="posting.postingType !=null">
+                and type=#{posting.postingType}
             </if>
         </where>
         <if test="sortRule !=null and sortPropertyName!=null">
@@ -58,5 +58,11 @@
             </if>
         </where>
     </select>
+
+    <insert id="insertByEntity" parameterType="com.forum.projectlzy.entity.Posting" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into posting
+        values (null, #{publisher}, #{publishTime}, 1, #{title}, #{content}, #{lastReplyTime}, 0, #{postingType})
+    </insert>
 
 </mapper>

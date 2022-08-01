@@ -33,7 +33,7 @@ public class Posting {
      * 帖子状态
      * 0 表示被隐藏, 1表示正常
      */
-    private Integer state;
+    private Integer postingState;
 
     /**
      * 帖子标题
@@ -59,5 +59,5 @@ public class Posting {
      * 帖子类型
      * 0 表示文字类型, 1表示视频类型
      */
-    private Integer type;
+    private Integer postingType;
 }
