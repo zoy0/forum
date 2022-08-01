@@ -57,6 +57,8 @@
             </div>
         </template>
 
+        <img  src='/posting/stream/384c8e91-1560-480d-8258-6545c4c1369e.png' style="width: 500px "></img>
+
 
         <!-- 分页 -->
         <el-pagination background layout="prev, pager, next" :total="total_number" :current-page.sync="currentPage"
@@ -85,28 +87,30 @@
                     </el-input>
                 </el-form-item>
 
-                <el-link type="success"  @click="addblock">添加代码块</el-link>
+                <el-link type="success" @click="addblock">添加代码块</el-link>
 
 
 
                 <el-upload id="el-upload" ref="uploadForm" :auto-upload="false" :http-request="upLoad" action="#"
-                    :on-remove="onRemove" :before-upload="beforeUpload"  list-type="picture">
+                    :on-remove="onRemove" :before-upload="beforeUpload" list-type="picture" :on-preview="addImg"
+                     multiple>
                     <el-button slot="trigger" size="small" type="primary">
                         点击上传
                     </el-button>
                     </template>
                 </el-upload>
 
-       
+
 
 
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
-                <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+                <el-button type="primary" @click="submitFile">确 定</el-button>
+                <el-button type="primary" @click="debug">debug</el-button>
             </div>
         </el-dialog>
-        
+
     </div>
     <script>
         new Vue({
@@ -121,8 +125,8 @@
 
             methods: {
 
-                addblock(){
-                    this.form.content =this.form.content+ "<pre><code class=\"语言类型\"></code></pre>";
+                addblock() {
+                    this.form.content = this.form.content + "<pre><code class=\"语言类型\"></code></pre>";
                 },
 
                 //例子
@@ -130,18 +134,26 @@
                 //之所以要写一个空方法是因为需要获取到组件的file数组
                 //如果不写这个方法  会取action里面的值来进行上传（就算action为空也会）
                 upLoad(params) {
-
                 },
 
                 //fileList是我定义的用于存储file数组的变量
                 //在上传前，将文件存储到fileList里面
                 beforeUpload(file) {
-                    this.fileList.push(file)
+                    // this.fileList.push(file);
+                    // this.file=file
+                    console.log("添加文件后", this.fileList)
                 },
                 //移除方法，将fileList里面的file去掉
                 onRemove(file) {
                     let index = this.fileList.findIndex(fileItem => fileItem.uid === file.uid);
                     this.fileList.splice(index, 1);
+                    console.log("移除文件后", this.fileList)
+                },
+
+                addImg(file) {
+                    this.form.content = this.form.content + "<img  src='" + file.name + "' style=\"width: 500px \"></img>";
+                    this.fileList.push(file.raw);
+                    console.log(file)
                 },
 
                 submitFile() {
@@ -151,25 +163,42 @@
                     //对fileList用formData拼接
                     let formData = new FormData();
                     this.fileList.forEach((item) => {
-                        formData.append("file", item);
-                    })
-                    //这里设置下请求头和传递的额外参数
-                    $http.post("bmp/v1/chaincode/uploadEnclosure/" + this.data.code, formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then(data => {
-                        console.log(data)
-                    }).catch(error => {
-                        this.$message({
-                            message: "error",
-                            type: 'error'
-                        })
+                        formData.append("photo", item);
                     });
+                    // formData.append("photo",this.file)
+                    //这里设置下请求头和传递的额外参数
+
+                    formData.append("title",this.form.title);
+                    formData.append("content",this.form.content);
+
+                    axios({
+                        method: "post",
+                        url: "/posting/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token":Cookie.get("token")
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        console.log("上传结果", resp.data);
+
+                    })
+
+
+
+                    // $http.post(" /posting/add ", formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then(data => {
+                    //     console.log(data)
+                    // }).catch(error => {
+                    //     this.$message({
+                    //         message: "error",
+                    //         type: 'error'
+                    //     })
+                    // });
                 },
 
 
-                checkType(file, fileList) {
 
-                    console.log("图片", file)
-
-                },
 
                 handleCurrentChange() {
                     console.log(this.currentPage)
@@ -182,15 +211,10 @@
 
                 // 查看帖子
                 view(id) {
-                    window.location.href = "posting.html?id=" + id;
+                    console.log(this.fileList)
                 },
 
-                handleRemove(file, fileList) {
-                    console.log(file, fileList);
-                },
-                handlePreview(file) {
-                    console.log(file);
-                },
+
 
 
                 open() {
@@ -220,7 +244,7 @@
                         data: null
                     }).then(resp => {
                         console.log("结果", resp.data)
-                        let data=resp.data.data;
+                        let data = resp.data.data;
                         this.tabledata = data.list;
                         this.total_number = data.totalNumber;
                     });
@@ -256,7 +280,8 @@
                         },
                     ],
 
-                    fileList: [{ name: "", url: '' }],
+                    fileList: [],
+                    // file:null,
                     form: {
                         title: "",
                         content: "",

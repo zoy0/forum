@@ -55,6 +55,8 @@ public class FtpUtils {
             ftp.makeDirectory(ftpBasePath + path);
             //存储文件
             ftp.changeWorkingDirectory(ftpBasePath + path);
+
+//            被动模式 Passive
             ftp.enterLocalPassiveMode();
             map.forEach((fileName, inputStream) -> {
                 try {
@@ -63,6 +65,9 @@ public class FtpUtils {
                     e.printStackTrace();
                 }
             });
+
+
+            //主动模式，port
             ftp.enterLocalActiveMode();
             ftpPool.returnFtpClient(ftp);
         } catch (IOException e) {
