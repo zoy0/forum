@@ -37,7 +37,7 @@
         <!-- 搜索框 -->
         <div style="margin-top: 10px;">
             <el-input v-model="input" placeholder="请输入内容" style="width:30%;"></el-input>
-            <el-button type="primary" icon="el-icon-search"  @click="searchMethod" >搜索</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="searchMethod">搜索</el-button>
         </div>
         <el-button type="success" plain style="margin-top: 20px; margin-bottom: 10px;" @click="dialogVisible = true">发布
         </el-button>
@@ -177,19 +177,29 @@
 
                     formData.append("title", this.form.title);
                     formData.append("content", this.form.content);
-
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
                     axios({
                         method: "post",
                         url: "/posting/add",
                         headers: {
                             "Content-Type": "multipart/form-data",
-                            "token": Cookie.get("token")
+                            "token": token
                         },
                         withCredentials: true,
                         data: formData
                     }).then(resp => {
-                        console.log("上传结果", resp.data);
-
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('发布成功', '', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    location.reload();
+                                }
+                            })
+                        }
                     })
 
 
