@@ -37,7 +37,7 @@
         <!-- 搜索框 -->
         <div style="margin-top: 10px;">
             <el-input v-model="input" placeholder="请输入内容" style="width:30%;"></el-input>
-            <el-button type="primary" icon="el-icon-search">搜索</el-button>
+            <el-button type="primary" icon="el-icon-search"  @click="searchMethod" >搜索</el-button>
         </div>
         <el-button type="success" plain style="margin-top: 20px; margin-bottom: 10px;" @click="dialogVisible = true">发布
         </el-button>
@@ -50,7 +50,7 @@
                         <div>
                             <el-link type="info" @click="view(item.id)">{{item.title}}</el-link><br>
                             <span>{{item.simpleContent}}</span>
-                            <div v-if="item.fileHtmlString!=null" >
+                            <div v-if="item.fileHtmlString!=null">
                                 <div v-html="item.fileHtmlString"></div>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
 
                 <el-upload id="el-upload" ref="uploadForm" :auto-upload="false" :http-request="upLoad" action="#"
                     :on-remove="onRemove" :before-upload="beforeUpload" list-type="picture" :on-preview="addImg"
-                     multiple>
+                    multiple>
                     <el-button slot="trigger" size="small" type="primary">
                         点击上传
                     </el-button>
@@ -158,6 +158,11 @@
                     console.log(file)
                 },
 
+                searchMethod() {
+                    this.search = this.input;
+                    this.getPostings();
+                },
+
                 submitFile() {
                     //点击提交的时候触发的方法
                     //第一句话是触发上传组件的上传方法 这样才能触发beforeUpload（因为我们写了取消自动上传）
@@ -170,15 +175,15 @@
                     // formData.append("photo",this.file)
                     //这里设置下请求头和传递的额外参数
 
-                    formData.append("title",this.form.title);
-                    formData.append("content",this.form.content);
+                    formData.append("title", this.form.title);
+                    formData.append("content", this.form.content);
 
                     axios({
                         method: "post",
                         url: "/posting/add",
                         headers: {
                             "Content-Type": "multipart/form-data",
-                            "token":Cookie.get("token")
+                            "token": Cookie.get("token")
                         },
                         withCredentials: true,
                         data: formData
@@ -203,6 +208,7 @@
 
 
                 handleCurrentChange() {
+                    this.getPostings();
                     console.log(this.currentPage)
                 },
 
@@ -232,18 +238,18 @@
                 },
 
                 getPostings() {
-                    // let formData = new FormData();
-                    // formData.append('username', this.form.name);
-                    // formData.append('password', encryptData(this.form.password));
-                    // formData.append('admin', false);
+                    let _this = this;
                     axios({
                         method: "get",
                         url: "/posting/list",
-                        // headers: {
-                        //     "Content-Type": "multipart/form-data"
-                        // },
-                        // withCredentials: true,
-                        data: null
+                        params: {
+                            'search': _this.search,
+                            'pageNumber': _this.currentPage,
+                            'limitNumber': 10,
+                            'type': _this.type,
+                            'sortRule': _this.sortRule,
+                            'sortPropertyName': _this.sortPropertyName,
+                        }
                     }).then(resp => {
                         console.log("结果", resp.data)
                         let data = resp.data.data;
@@ -261,8 +267,15 @@
                     currentFile: null,
 
                     total_number: 50,
-
                     currentPage: 1,
+                    input: "",
+                    search: "",
+                    sortRule: "",
+                    sortPropertyName: "",
+                    limitNumber: "",
+                    type: 0,
+
+
                     token: null,
                     tabledata: [
                         {

@@ -37,8 +37,6 @@ public class PostingServiceImpl implements PostingService {
     public ResultDto findPosting(String search, Integer pageNumber, Integer limitNumber, Integer type, String sortRule, String sortPropertyName) {
         Posting searchedPosting = new Posting();
         searchedPosting.setPostingType(type);
-        pageNumber = 1;
-        limitNumber = 10;
 
         List<Posting> list = postingDao.findByPageAndSort(search, searchedPosting, (pageNumber - 1) * limitNumber, limitNumber, sortRule, sortPropertyName);
 
