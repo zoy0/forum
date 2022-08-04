@@ -39,7 +39,7 @@
                 and type=#{posting.postingType}
             </if>
         </where>
-        <if test="sortRule !=null and sortPropertyName!=null">
+        <if test="sortRule !=null and sortPropertyName!=null and sortRule !='' and sortPropertyName!=''">
             order by ${sortPropertyName} ${sortRule}
         </if>
         <if test="pageNumber !=null and limitNumber !=null">
