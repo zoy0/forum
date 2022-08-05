@@ -20,6 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * 帖子控制层
+ *
+ * @author 扬
+ */
 @RequestMapping("/posting")
 @RestController
 public class PostingController {
@@ -30,6 +35,17 @@ public class PostingController {
     @Autowired
     private FtpUtils ftpUtils;
 
+    /**
+     * 根据条件搜索帖子
+     *
+     * @param search           模糊搜索内容
+     * @param pageNumber       页数
+     * @param limitNumber      每页条数
+     * @param type             帖子类型
+     * @param sortRule         升/降序
+     * @param sortPropertyName 由哪个字段决定升降序
+     * @return list结果
+     */
     @RequestMapping("/list")
     public ResultDto findPosting(String search,
                                  Integer pageNumber,
@@ -40,21 +56,35 @@ public class PostingController {
         return postingService.findPosting(search, pageNumber, limitNumber, type, sortRule, sortPropertyName);
     }
 
+    /**
+     * 发布帖子
+     *
+     * @param title   标题
+     * @param content 正文
+     * @param photo   照片
+     * @return
+     */
     @PostMapping("/add")
     public ResultDto addPosting(String title,
                                 String content,
-                                MultipartFile[] photo)  {
+                                MultipartFile[] photo) {
         User user = CurrentUserInfo.get();
-        if (user==null){
-            return ResultDto.buildErrorResultDto(HttpCodeContant.UNAUTHORIZED,"用户未登录");
+        if (user == null) {
+            return ResultDto.buildErrorResultDto(HttpCodeContant.UNAUTHORIZED, "用户未登录");
         }
-        return postingService.addPosting(user,title,content,photo);
+        return postingService.addPosting(user, title, content, photo);
     }
 
 
+    /**
+     * 获取照片文件的流
+     *
+     * @param response response
+     * @param fileName 文件名
+     */
     @RequestMapping("/photo/{fileName}")
     public void getStreamData(HttpServletResponse response,
-                              @PathVariable("fileName")String fileName) {
+                              @PathVariable("fileName") String fileName) {
 
         InputStream in = null;
         OutputStream os = null;
@@ -68,8 +98,8 @@ public class PostingController {
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }finally {
-            if(in!=null) {
+        } finally {
+            if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
@@ -79,8 +109,14 @@ public class PostingController {
 
     }
 
+    /**
+     * 由帖子id获取帖子详情
+     *
+     * @param postingId 帖子id
+     * @return
+     */
     @GetMapping("/detail/{postingId}")
-    public ResultDto getDetailedPosting(@PathVariable("postingId")Integer postingId){
+    public ResultDto getDetailedPosting(@PathVariable("postingId") Integer postingId) {
         return postingService.getPostingById(postingId);
     }
 

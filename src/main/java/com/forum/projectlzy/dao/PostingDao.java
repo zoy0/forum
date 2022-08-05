@@ -8,6 +8,9 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 帖子dao层
+ */
 @Mapper
 public interface PostingDao extends BaseDao<Posting> {
 
@@ -28,7 +31,20 @@ public interface PostingDao extends BaseDao<Posting> {
                                     @Param("sortRule") String sortRule,
                                     @Param("sortPropertyName") String sortPropertyName);
 
+    /**
+     * 由模糊搜索的内容获取结果数
+     *
+     * @param search 模糊搜索
+     * @param type   类型
+     * @return
+     */
     Integer countBySearch(@Param("search") String search, @Param("type") Integer type);
 
+    /**
+     * 通过帖子id搜索
+     *
+     * @param id 帖子id
+     * @return
+     */
     Posting findById(@Param("id") Integer id);
 }
