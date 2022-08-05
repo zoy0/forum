@@ -95,5 +95,10 @@ public class PostingServiceImpl implements PostingService {
         return ResultDto.buildSuccessResultDto("发布成功", null);
     }
 
+    @Override
+    public ResultDto getPostingById(Integer postingId) {
+        return ResultDto.buildSuccessResultDto(null,postingDao.findById(postingId));
+    }
+
 
 }

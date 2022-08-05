@@ -8,4 +8,6 @@ public interface PostingService {
     ResultDto findPosting(String search, Integer pageNumber, Integer limitNumber, Integer type, String sortRule, String sortPropertyName);
 
     ResultDto addPosting(User user , String title, String content, MultipartFile[] photo);
+
+    ResultDto getPostingById(Integer postingId);
 }

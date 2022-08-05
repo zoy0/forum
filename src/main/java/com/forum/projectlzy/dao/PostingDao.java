@@ -30,4 +30,5 @@ public interface PostingDao extends BaseDao<Posting> {
 
     Integer countBySearch(@Param("search") String search, @Param("type") Integer type);
 
+    Posting findById(@Param("id") Integer id);
 }

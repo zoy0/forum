@@ -7,10 +7,7 @@ import com.forum.projectlzy.entity.*;
 import com.forum.projectlzy.service.PostingService;
 import com.forum.projectlzy.utils.ftp.FtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -81,5 +78,11 @@ public class PostingController {
         }
 
     }
+
+    @GetMapping("/detail/{postingId}")
+    public ResultDto getDetailedPosting(@PathVariable("postingId")Integer postingId){
+        return postingService.getPostingById(postingId);
+    }
+
 
 }

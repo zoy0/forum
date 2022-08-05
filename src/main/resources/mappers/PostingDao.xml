@@ -18,7 +18,7 @@
 
 
     <select id="findByPageAndSort" resultMap="Posting">
-        select title ,content ,publish_time ,last_reply_time from posting
+        select * from posting
         <where>
             <if test="search != null and search !=''">
                 (title like "%"#{search}"%" or content like "%"#{search}"%" or publisher like "%"#{search}"%")
@@ -64,5 +64,9 @@
         insert into posting
         values (null, #{publisher}, #{publishTime}, 1, #{title}, #{content}, #{lastReplyTime}, 0, #{postingType})
     </insert>
+
+    <select id="findById" resultMap="Posting">
+        select * from posting where id = #{id}
+    </select>
 
 </mapper>

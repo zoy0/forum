@@ -24,6 +24,10 @@
                 <p style="color:rgb(150, 125, 125)">{{posting.publishTime}}</p>
                 <h2>{{posting.title}}</h2>
                 <strong v-html="posting.content"></strong>
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="postingMessage" style="width:40% ;">
+                </el-input>
+                <el-button type="primary" @click="submitpostingMessage()">提交</el-button>
+
             </el-card>
         </div>
 
@@ -35,7 +39,13 @@
                         <p>{{item.publishTime}}</p>
                         <p>第{{item.threadNumber}}楼</p>
                         <strong v-html="item.content"></strong><br>
+                        <el-link type="primary" @click="showTheBack(index)">回复</el-link>
                         <el-link type="primary" v-if="item.black!=0" @click="view(index)">查看全部回复</el-link>
+                        <div v-if="showBackComment==index">
+                        <el-input type="textarea" autosize placeholder="请输入内容" v-model="input" style="width:40% ;">
+                        </el-input>
+                        <el-button type="primary" @click="submitBack(index)">提交</el-button>
+                        </div>
                     </el-card>
 
                 </el-col>
@@ -58,7 +68,7 @@
                     <span>{{item.publisher}}</span>
                     <span>({{item.publishTime}}):</span>
                 </div>
-                <strong >{{item.content}}</strong>
+                <strong>{{item.content}}</strong>
                 <el-divider></el-divider>
             </div>
 
@@ -81,12 +91,30 @@
             el: "#app",
 
             mounted() {
+                this.getDetailedPosting();
                 hljs.initHighlightingOnLoad();
             },
 
             methods: {
+                submitBack(index){
+                    console.log(index+":"+this.input)
+                },
 
+                showTheBack(index){
+                    this.input="";
+                    this.showBackComment=index;
+                },
 
+                getDetailedPosting() {
+                    let _this = this;
+                    axios({
+                        method: "get",
+                        url: "/posting/detail/" + getQueryVariable("id"),
+                    }).then(resp => {
+                        console.log("结果", resp.data)
+                        this.posting = resp.data.data;
+                    });
+                },
 
                 view(threadNumber) {
                     // TODO axaj查询
@@ -103,6 +131,10 @@
 
             data() {
                 return {
+                    input:"",
+                    showBackComment:-1,
+                    postingMessage: "",
+
                     dialogVisible: false,
                     viewThreadNumbe: 0,
                     posting: {
