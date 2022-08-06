@@ -54,7 +54,7 @@ public class PostingServiceImpl implements PostingService {
             if (content.length() > 40) {
                 content = content.substring(0, 40) + "...";
             }
-            return new SimplePostingDto(posting.getId(),posting.getTitle(), content, imgString, posting.getFavoriteNumber(), posting.getPublishTime());
+            return new SimplePostingDto(posting.getId(),posting.getTitle(), content, imgString, posting.getFavoriteNumber(), posting.getPublishTime(),posting.getTotalThread(),posting.getReadNumber());
         }).collect(Collectors.toList());
 //        TODO
 //        video兼容

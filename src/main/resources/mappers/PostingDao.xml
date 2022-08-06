@@ -14,6 +14,8 @@
         <result property="lastReplyTime" column="last_reply_time"/>
         <result property="favoriteNumber" column="favorite_number"/>
         <result property="postingType" column="type"/>
+        <result property="totalThread" column="total_thread"/>
+        <result property="readNumber" column="read_Number"/>
     </resultMap>
 
 

@@ -60,4 +60,14 @@ public class Posting {
      * 0 表示文字类型, 1表示视频类型
      */
     private Integer postingType;
+
+    /**
+     * 留言层数
+     */
+    private Integer totalThread;
+
+    /**
+     * 游览次数
+     */
+    private Integer readNumber;
 }

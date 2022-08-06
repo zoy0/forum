@@ -21,4 +21,8 @@ private Integer id;
     private Integer like;
 
     private Date lastPublishTime;
+
+    private Integer totalThread;
+
+    private Integer readNumber;
 }
