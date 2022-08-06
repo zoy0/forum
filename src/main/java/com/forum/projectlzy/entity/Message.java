@@ -37,7 +37,7 @@ public class Message {
     /**
      * 发布时间
      */
-    private Date publicTime;
+    private Date publishTime;
 
     /**
      * 正文
