@@ -2,10 +2,7 @@ package com.forum.projectlzy.service.impl;
 
 import com.forum.projectlzy.dao.MessageDao;
 import com.forum.projectlzy.dao.PostingDao;
-import com.forum.projectlzy.entity.Message;
-import com.forum.projectlzy.entity.Posting;
-import com.forum.projectlzy.entity.ResultDto;
-import com.forum.projectlzy.entity.User;
+import com.forum.projectlzy.entity.*;
 import com.forum.projectlzy.service.MessageService;
 import com.forum.projectlzy.utils.ftp.FtpUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -61,5 +55,11 @@ public class MessageServiceImpl implements MessageService {
             log.info("用户 {} 日期 {} 帖子id {} 上传文件 :{}", user.getUserName(),message.getPublishTime(),postingId , map.keySet());
         }
         return ResultDto.buildSuccessResultDto("留言成功",null);
+    }
+
+    @Override
+    public ResultDto findMessage(Integer postingId, Integer pageNumber, Integer limitNumber, String sortRule, String sortPropertyName) {
+        List<Message> list =messageDao.findMessageByPageAndSort(postingId,(pageNumber - 1) * limitNumber, limitNumber, sortRule, sortPropertyName);
+        return ResultDto.buildSuccessResultDto(null, list);
     }
 }

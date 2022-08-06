@@ -19,4 +19,14 @@
             values (null,#{postingId},#{publisher},#{threadNumber},#{publishTime},#{content})
     </insert>
 
+    <select id="findMessageByPageAndSort" resultMap="Message">
+        select * from message where postingId = #{postingId}
+        <if test="sortRule !=null and sortPropertyName!=null and sortRule !='' and sortPropertyName!=''">
+            order by ${sortPropertyName} ${sortRule}
+        </if>
+        <if test="pageNumber !=null and limitNumber !=null">
+            limit ${pageNumber} ,${limitNumber}
+        </if>
+    </select>
+
 </mapper>

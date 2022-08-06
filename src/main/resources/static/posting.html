@@ -100,6 +100,7 @@
 
             mounted() {
                 this.getDetailedPosting();
+                this.getMessages();
                 hljs.initHighlightingOnLoad();
             },
 
@@ -193,6 +194,17 @@
                     }).then(resp => {
                         console.log("结果", resp.data)
                         this.posting = resp.data.data;
+                    });
+                },
+
+                getMessages(){
+                    let _this = this;
+                    axios({
+                        method: "get",
+                        url: "/message/" + getQueryVariable("id"),
+                    }).then(resp => {
+                        console.log("结果", resp.data)
+                        this.message = resp.data.data;
                     });
                 },
 

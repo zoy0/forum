@@ -6,9 +6,7 @@ import com.forum.projectlzy.entity.ResultDto;
 import com.forum.projectlzy.entity.User;
 import com.forum.projectlzy.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -40,4 +38,26 @@ public class MessageController {
         return messageService.addMessage(user,postingId,content,photo);
     }
 
+
+    /**
+     * 搜索某个帖子下的留言
+     * @param postingId 帖子id
+     * @param pageNumber       页数
+     * @param limitNumber      每页条数
+     * @param sortRule         升/降序
+     * @param sortPropertyName 由哪个字段决定升降序
+     * @return
+     */
+    @GetMapping("/{postingId}")
+    public ResultDto findMessage(@PathVariable("postingId") Integer postingId,
+                                 Integer pageNumber,
+                                 Integer limitNumber,
+                                 String sortRule,
+                                 String sortPropertyName){
+        if (pageNumber==null||limitNumber==null){
+            pageNumber=1;
+            limitNumber=10;
+        }
+        return messageService.findMessage(postingId,pageNumber,limitNumber,sortRule,sortPropertyName);
+    }
 }
