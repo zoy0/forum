@@ -24,10 +24,18 @@
                 <p style="color:rgb(150, 125, 125)">{{posting.publishTime}}</p>
                 <h2>{{posting.title}}</h2>
                 <strong v-html="posting.content"></strong>
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="postingMessage" style="width:40% ;">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="addedMessage.content" style="width:40% ;">
                 </el-input>
                 <el-button type="primary" @click="submitpostingMessage()">提交</el-button>
-
+                <el-link type="success" @click="addblock">添加代码块</el-link>
+                <el-upload id="el-upload" ref="uploadForm" :auto-upload="false" :http-request="upLoad" action="#"
+                    :on-remove="onRemove" :before-upload="beforeUpload" list-type="picture" :on-preview="addImg"
+                    multiple>
+                    <el-button slot="trigger" size="small" type="primary">
+                        点击上传
+                    </el-button>
+                    </template>
+                </el-upload>
             </el-card>
         </div>
 
@@ -42,9 +50,9 @@
                         <el-link type="primary" @click="showTheBack(index)">回复</el-link>
                         <el-link type="primary" v-if="item.black!=0" @click="view(index)">查看全部回复</el-link>
                         <div v-if="showBackComment==index">
-                        <el-input type="textarea" autosize placeholder="请输入内容" v-model="input" style="width:40% ;">
-                        </el-input>
-                        <el-button type="primary" @click="submitBack(index)">提交</el-button>
+                            <el-input type="textarea" autosize placeholder="请输入内容" v-model="input" style="width:40% ;">
+                            </el-input>
+                            <el-button type="primary" @click="submitBack(index)">提交</el-button>
                         </div>
                     </el-card>
 
@@ -96,13 +104,85 @@
             },
 
             methods: {
-                submitBack(index){
-                    console.log(index+":"+this.input)
+                addblock() {
+                    this.addedMessage.content = this.addedMessage.content + "<pre><code class=\"语言类型\"></code></pre>";
                 },
 
-                showTheBack(index){
-                    this.input="";
-                    this.showBackComment=index;
+                //例子
+                //我的上传方法并没有写任何东西，因为我的上传是通过点击提交的时候再自定义上传的
+                //之所以要写一个空方法是因为需要获取到组件的file数组
+                //如果不写这个方法  会取action里面的值来进行上传（就算action为空也会）
+                upLoad(params) {
+                },
+
+                //fileList是我定义的用于存储file数组的变量
+                //在上传前，将文件存储到fileList里面
+                beforeUpload(file) {
+                    // this.fileList.push(file);
+                    // this.file=file
+                    console.log("添加文件后", this.fileList)
+                },
+                //移除方法，将fileList里面的file去掉
+                onRemove(file) {
+                    let index = this.addedMessage.fileList.findIndex(fileItem => fileItem.uid === file.uid);
+                    this.addedMessage.fileList.splice(index, 1);
+                    console.log("移除文件后", this.fileList)
+                },
+
+                addImg(file) {
+                    this.addedMessage.content = this.addedMessage.content + "<img  src='" + file.name + "' style=\"width: 500px \"></img>";
+                    this.addedMessage.fileList.push(file.raw);
+                    console.log(file)
+                },
+
+                submitpostingMessage() {
+                    //点击提交的时候触发的方法
+                    //第一句话是触发上传组件的上传方法 这样才能触发beforeUpload（因为我们写了取消自动上传）
+                    this.$refs.uploadForm.submit()
+                    //对fileList用formData拼接
+                    let formData = new FormData();
+                    this.addedMessage.fileList.forEach((item) => {
+                        formData.append("photo", item);
+                    });
+                    // formData.append("photo",this.file)
+                    //这里设置下请求头和传递的额外参数
+
+                    formData.append("postingId", getQueryVariable("id"));
+                    formData.append("content", this.addedMessage.content);
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
+                    axios({
+                        method: "post",
+                        url: "/message/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token": token
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('留言成功', '', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    location.reload();
+                                }
+                            })
+                        }
+                    })
+                },
+
+
+                submitBack(index) {
+                    console.log(index + ":" + this.input)
+                },
+
+                showTheBack(index) {
+                    this.input = "";
+                    this.showBackComment = index;
                 },
 
                 getDetailedPosting() {
@@ -131,8 +211,13 @@
 
             data() {
                 return {
-                    input:"",
-                    showBackComment:-1,
+                    currentFile: null,
+                    addedMessage:{
+                        fileList: [],
+                        content:"",
+                    },
+                    input: "",
+                    showBackComment: -1,
                     postingMessage: "",
 
                     dialogVisible: false,

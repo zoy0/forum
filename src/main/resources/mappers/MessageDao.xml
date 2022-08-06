@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.forum.projectlzy.dao.MessageDao">
+
+    <resultMap id="Message" type="com.forum.projectlzy.entity.Message">
+        <id property="id" column="id"/>
+        <result property="publisher" column="publisher"/>
+        <result property="postingId" column="postingId"/>
+        <result property="content" column="content"/>
+        <result property="threadNumber" column="threadNumber"/>
+        <result property="publishTime" column="publish_time"/>
+    </resultMap>
+
+    <insert id="insertByEntity" parameterType="com.forum.projectlzy.entity.Message" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into message
+            values (null,#{postingId},#{publisher},#{threadNumber},#{publishTime},#{content})
+    </insert>
+
+</mapper>
