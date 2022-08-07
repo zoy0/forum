@@ -17,7 +17,7 @@
     <insert id="insertByEntity" parameterType="com.forum.projectlzy.entity.Message" useGeneratedKeys="true"
             keyProperty="id">
         insert into message
-            values (null,#{postingId},#{publisher},#{threadNumber},#{publishTime},#{content},0)
+        values (null, #{postingId}, #{publisher}, #{threadNumber}, #{publishTime}, #{content}, 0)
     </insert>
 
     <select id="findMessageByPageAndSort" resultMap="Message">
@@ -29,5 +29,33 @@
             limit ${pageNumber} ,${limitNumber}
         </if>
     </select>
+
+    <select id="findById" resultMap="Message">
+        select *
+        from message
+        where id = #{id}
+    </select>
+
+    <update id="updateMessageById">
+        update message
+        <set>
+            <if test="message.publisher!=null">
+                publisher=#{message.publisher},
+            </if>
+            <if test="message.postingId!=null">
+                postingId=#{message.postingId},
+            </if>
+            <if test="message.content!=null">
+                content=#{message.content},
+            </if>
+            <if test="message.threadNumber!=null">
+                threadNumber=#{message.threadNumber},
+            </if>
+            <if test="message.backNumber!=null">
+                back_number=#{message.backNumber},
+            </if>
+        </set>
+            where id = #{id}
+    </update>
 
 </mapper>
