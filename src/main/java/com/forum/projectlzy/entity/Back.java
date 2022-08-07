@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Black {
+public class Back {
 
     /**
      * 表中回复id
@@ -38,4 +38,9 @@ public class Black {
      * 正文
      */
     private String content;
+
+    /**
+     * 该回复所回复的id
+     */
+    private Integer toBackId;
 }
