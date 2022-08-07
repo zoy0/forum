@@ -11,12 +11,13 @@
         <result property="content" column="content"/>
         <result property="threadNumber" column="threadNumber"/>
         <result property="publishTime" column="publish_time"/>
+        <result property="backNumber" column="back_number"/>
     </resultMap>
 
     <insert id="insertByEntity" parameterType="com.forum.projectlzy.entity.Message" useGeneratedKeys="true"
             keyProperty="id">
         insert into message
-            values (null,#{postingId},#{publisher},#{threadNumber},#{publishTime},#{content})
+            values (null,#{postingId},#{publisher},#{threadNumber},#{publishTime},#{content},0)
     </insert>
 
     <select id="findMessageByPageAndSort" resultMap="Message">

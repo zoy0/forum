@@ -44,4 +44,9 @@ public class Message {
      */
     private String content;
 
+    /**
+     * 回复数量
+     */
+    private Integer backNumber;
+
 }
