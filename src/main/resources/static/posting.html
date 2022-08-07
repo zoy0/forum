@@ -24,7 +24,8 @@
                 <p style="color:rgb(150, 125, 125)">{{posting.publishTime}}</p>
                 <h2>{{posting.title}}</h2>
                 <strong v-html="posting.content"></strong>
-                <el-input type="textarea" autosize placeholder="请输入内容" v-model="addedMessage.content" style="width:40% ;">
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="addedMessage.content"
+                    style="width:40% ;">
                 </el-input>
                 <el-button type="primary" @click="submitpostingMessage()">提交</el-button>
                 <el-link type="success" @click="addblock">添加代码块</el-link>
@@ -48,7 +49,7 @@
                         <p>第{{item.threadNumber}}楼</p>
                         <strong v-html="item.content"></strong><br>
                         <el-link type="primary" @click="showTheBack(index)">回复</el-link>
-                        <el-link type="primary" v-if="item.black!=0" @click="view(index)">查看全部回复</el-link>
+                        <el-link type="primary" v-if="item.backNumber!=0" @click="view(index)">查看全部回复</el-link>
                         <div v-if="showBackComment==index">
                             <el-input type="textarea" autosize placeholder="请输入内容" v-model="input" style="width:40% ;">
                             </el-input>
@@ -71,17 +72,23 @@
                 <strong v-html="message[this.viewThreadNumbe].content"></strong><br>
             </el-card>
 
-            <div v-for="item in message[this.viewThreadNumbe].back" :key="item.index" :offset="1">
+            <div v-for="(item ,index) in back.backList" :key="item.index" :offset="1">
                 <div style="margin-bottom: 10px">
                     <span>{{item.publisher}}</span>
                     <span>({{item.publishTime}}):</span>
                 </div>
                 <strong>{{item.content}}</strong>
+                <br>
+                    <el-link type="primary" @click="addToBack(index)" style="margin-top: 10px;">回复</el-link>
                 <el-divider></el-divider>
             </div>
-
+            <el-input type="textarea" autosize placeholder="请输入内容" v-model="newBack.backContent" style="width: 61.8%;">
+            </el-input>
+            <el-button type="primary" @click="showNewBack" style="margin-top: 10px;">提交</el-button>
             <span slot="footer" class="dialog-footer">
-
+                <el-pagination small layout="prev, pager, next" :total="back.totalNumber"
+                    :current-page.sync="back.currentPage">
+                </el-pagination>
                 <el-button @click="dialogVisible = false">收起</el-button>
             </span>
         </el-dialog>
@@ -197,7 +204,7 @@
                     });
                 },
 
-                getMessages(){
+                getMessages() {
                     let _this = this;
                     axios({
                         method: "get",
@@ -218,15 +225,46 @@
                 show() {
                     console.log(getQueryVariable("id"));
                 },
+                showNewBack(){
+                    console.log(this.newBack)
+                },
+                addToBack(index){
+                    this.newBack.backContent="回复 "+this.back.backList[index].publisher+" : ";
+                    this.newBack.toBackId=this.back.backList[index].id;
+                },
 
             },
 
             data() {
                 return {
+                    back: {
+                        currentPage: 1,
+                        totalNumber: 2,
+                        pageNumber: 1,
+                        backList: [{
+                            id:1,
+                            publisher: "zy233",
+                            publishTime: "2022-3-10",
+                            content: "万名之",
+                        },
+                        {
+                            id:2,
+                            publisher: "admin",
+                            publishTime: "2022-3-11",
+                            content: "thanks",
+                        }],
+                        
+                    },
+
+                    newBack:{
+                        toBackId:null,
+                        backContent: "",
+                    },
+
                     currentFile: null,
-                    addedMessage:{
+                    addedMessage: {
                         fileList: [],
-                        content:"",
+                        content: "",
                     },
                     input: "",
                     showBackComment: -1,
@@ -246,41 +284,24 @@
                         publishTime: "2022-3-9",
                         threadNumber: "1",
                         content: "正是如此",
-                        black: 0,
-                        back: [{
-                            publisher: "",
-                            publishTime: "",
-                            content: "",
-                        }],
+                        backNumber: 0,
+
                     },
                     {
                         publisher: "zy233",
                         publishTime: "2022-3-10",
                         threadNumber: "2",
                         content: "补充一下,<pre> <code class=\"java\"> ResultDto login(String username, String password,boolean admin); </code> </pre>",
-                        black: 1,
-                        back: [{
-                            publisher: "admin",
-                            publishTime: "2022-10-11",
-                            content: "好的，谢谢！",
-                        }],
+                        backNumber: 1,
+
                     },
                     {
                         publisher: "zy233",
                         publishTime: "2022-3-10",
                         threadNumber: "3",
                         content: "还有以下几点<img src=\"https://s3.bmp.ovh/imgs/2022/07/16/7e82f0c970a591fa.png\" style=\"width: 500px \"></img>",
-                        black: 2,
-                        back: [{
-                            publisher: "zy233",
-                            publishTime: "2022-3-10",
-                            content: "万名之",
-                        },
-                        {
-                            publisher: "admin",
-                            publishTime: "2022-3-11",
-                            content: "thanks",
-                        }],
+                        backNumber: 2,
+
                     },]
                 }
             }
