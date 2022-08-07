@@ -50,6 +50,9 @@ public class MessageServiceImpl implements MessageService {
         message.setPublishTime(new Date());
         message.setThreadNumber(posting.getTotalThread()+1);
         messageDao.insertByEntity(message);
+        Map<String,Object> postingMap=new HashMap<>();
+        postingMap.put("totalThread",posting.getTotalThread()+1);
+        postingDao.updatePostingById(postingId,postingMap);
         if (!map.isEmpty()) {
             ftpUtils.upload(map, FtpUtils.IMG_PATH);
             log.info("用户 {} 日期 {} 帖子id {} 上传文件 :{}", user.getUserName(),message.getPublishTime(),postingId , map.keySet());

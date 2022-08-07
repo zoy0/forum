@@ -68,7 +68,46 @@
     </insert>
 
     <select id="findById" resultMap="Posting">
-        select * from posting where id = #{id}
+        select *
+        from posting
+        where id = #{id}
     </select>
+
+    <update id="updatePostingById" parameterType="com.forum.projectlzy.entity.Posting">
+        update posting
+        <set>
+            <if test="posting.publisher!=null">
+                publisher = #{posting.publisher},
+            </if>
+            <if test="posting.publishTime!=null">
+                publish_time=#{posting.publishTime},
+            </if>
+            <if test="posting.postingState!=null">
+                posting_state =#{posting.postingState},
+            </if>
+            <if test="posting.title!=null">
+                title=#{posting.title},
+            </if>
+            <if test="posting.content!=null">
+                content=#{posting.content},
+            </if>
+            <if test="posting.lastReplyTime!=null">
+                last_reply_time =#{posting.lastReplyTime},
+            </if>
+            <if test="posting.favoriteNumber!=null">
+                favorite_number=#{posting.favoriteNumber},
+            </if>
+            <if test="posting.postingType!=null">
+                type=#{posting.postingType},
+            </if>
+            <if test="posting.totalThread!=null">
+                total_thread=#{posting.totalThread},
+            </if>
+            <if test="posting.readNumber!=null">
+                readNumber=#{posting.readNumber},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 
 </mapper>

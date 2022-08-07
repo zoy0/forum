@@ -47,4 +47,12 @@ public interface PostingDao extends BaseDao<Posting> {
      * @return
      */
     Posting findById(@Param("id") Integer id);
+
+    /**
+     *根据id更新帖子
+     * @param id 帖子id
+     * @param posting 更新内容
+     * @return
+     */
+    Integer updatePostingById(@Param("id")Integer id,@Param("posting")Map<String,Object> posting);
 }
