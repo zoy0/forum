@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ public class BackServiceImpl implements BackService {
     @Resource
     private MessageDao messageDao;
 
-    Pattern pattern = Pattern.compile("回复 (\\S*) ：");
+    Pattern pattern = Pattern.compile("回复 (\\S*) :");
 
     @Override
     public ResultDto addBack(User user, Integer messageId, Integer toBackId, String content) {
@@ -53,5 +54,11 @@ public class BackServiceImpl implements BackService {
         map.put("backNumber",message.getBackNumber()+1);
         messageDao.updateMessageById(messageId,map);
         return ResultDto.buildSuccessResultDto("回复成功",null);
+    }
+
+    @Override
+    public ResultDto findBackByMessageId(Integer messageId, Integer pageNumber, Integer limitNumber, String sortRule, String sortPropertyName) {
+        List<Back> list = backDao.findMessageByPageAndSort(messageId,(pageNumber - 1) * limitNumber, limitNumber, sortRule, sortPropertyName);
+        return ResultDto.buildSuccessResultDto(null,list);
     }
 }

@@ -79,15 +79,15 @@
                 </div>
                 <strong>{{item.content}}</strong>
                 <br>
-                    <el-link type="primary" @click="addToBack(index)" style="margin-top: 10px;">回复</el-link>
+                <el-link type="primary" @click="addToBack(index)" style="margin-top: 10px;">回复</el-link>
                 <el-divider></el-divider>
             </div>
             <el-input type="textarea" autosize placeholder="请输入内容" v-model="newBack.backContent" style="width: 61.8%;">
             </el-input>
-            <el-button type="primary" @click="showNewBack" style="margin-top: 10px;">提交</el-button>
+            <el-button type="primary" @click="showNewBack()" style="margin-top: 10px;">提交</el-button>
             <span slot="footer" class="dialog-footer">
                 <el-pagination small layout="prev, pager, next" :total="back.totalNumber"
-                    :current-page.sync="back.currentPage">
+                    :current-page.sync="back.currentPage" :page-size="5" @current-change="handleCurrentChange2">
                 </el-pagination>
                 <el-button @click="dialogVisible = false">收起</el-button>
             </span>
@@ -186,6 +186,33 @@
 
                 submitBack(index) {
                     console.log(index + ":" + this.input)
+                    let formData = new FormData();
+                    formData.append("messageId", this.message[index].id);
+                    formData.append("content", this.input);
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
+                    axios({
+                        method: "post",
+                        url: "/back/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token": token
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('发布成功', '', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    location.reload();
+                                }
+                            })
+                        }
+                    })
                 },
 
                 showTheBack(index) {
@@ -219,19 +246,58 @@
                     // TODO axaj查询
                     this.viewThreadNumbe = threadNumber;
                     this.dialogVisible = true;
-
+                    axios({
+                        method: "get",
+                        url: "/back/message/" + this.message[threadNumber].id,
+                    }).then(resp => {
+                        console.log("结果", resp.data)
+                        this.back.backList = resp.data.data;
+                    });
+                    this.back.totalNumber=this.message[threadNumber].backNumber;
+                    console.log("回复总数",this.back.totalNumber)
                 },
 
                 show() {
                     console.log(getQueryVariable("id"));
                 },
-                showNewBack(){
-                    console.log(this.newBack)
+                showNewBack() {
+                    console.log(this.viewThreadNumbe, this.newBack)
+                    let formData = new FormData();
+                    formData.append("messageId", this.message[this.viewThreadNumbe].id);
+                    formData.append("content", this.newBack.backContent);
+                    formData.append("toBackId", this.newBack.toBackId);
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
+                    axios({
+                        method: "post",
+                        url: "/back/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token": token
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('发布成功', '', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    location.reload();
+                                }
+                            })
+                        }
+                    })
                 },
-                addToBack(index){
-                    this.newBack.backContent="回复 "+this.back.backList[index].publisher+" : ";
-                    this.newBack.toBackId=this.back.backList[index].id;
+                addToBack(index) {
+                    this.newBack.backContent = "回复 " + this.back.backList[index].publisher + " : ";
+                    this.newBack.toBackId = this.back.backList[index].id;
                 },
+                handleCurrentChange2(val){
+                    console.log(`当前页: ${val}`);
+                }
 
             },
 
@@ -242,22 +308,22 @@
                         totalNumber: 2,
                         pageNumber: 1,
                         backList: [{
-                            id:1,
+                            id: 1,
                             publisher: "zy233",
                             publishTime: "2022-3-10",
                             content: "万名之",
                         },
                         {
-                            id:2,
+                            id: 2,
                             publisher: "admin",
                             publishTime: "2022-3-11",
                             content: "thanks",
                         }],
-                        
+
                     },
 
-                    newBack:{
-                        toBackId:null,
+                    newBack: {
+                        toBackId: null,
                         backContent: "",
                     },
 

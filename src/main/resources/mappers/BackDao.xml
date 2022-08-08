@@ -16,11 +16,23 @@
     <insert id="insertByEntity" parameterType="com.forum.projectlzy.entity.Back" useGeneratedKeys="true"
             keyProperty="id">
         insert into back
-        values (null,#{messageId},#{publisher},#{publishTime},#{content},#{toBackId})
+        values (null, #{messageId}, #{publisher}, #{publishTime}, #{content}, #{toBackId})
     </insert>
 
     <select id="findBackById" resultMap="Back">
-        select * from back where id = #{id}
+        select *
+        from back
+        where id = #{id}
+    </select>
+
+    <select id="findMessageByPageAndSort" resultMap="Back">
+        select * from back where messageId = #{messageId}
+        <if test="sortRule !=null and sortPropertyName!=null and sortRule !='' and sortPropertyName!=''">
+            order by ${sortPropertyName} ${sortRule}
+        </if>
+        <if test="pageNumber !=null and limitNumber !=null">
+            limit ${pageNumber} ,${limitNumber}
+        </if>
     </select>
 
 </mapper>
