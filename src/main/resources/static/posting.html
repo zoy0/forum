@@ -61,7 +61,10 @@
             </el-row>
         </div>
 
-
+        <!-- 分页 -->
+        <el-pagination background layout="prev, pager, next" :total="posting.totalThread" :current-page.sync="currentPage"
+        @current-change="handleCurrentChange" style="margin-top: 20px;">
+    </el-pagination>
 
         <!-- 回复对话框 -->
         <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
@@ -205,12 +208,7 @@
                         if (data.code != 200) {
                             this.$message.error(data.message);
                         } else {
-                            this.$alert('发布成功', '', {
-                                confirmButtonText: '确定',
-                                callback: action => {
-                                    location.reload();
-                                }
-                            })
+                            this.$alert('发布成功')
                         }
                     })
                 },
@@ -236,6 +234,12 @@
                     axios({
                         method: "get",
                         url: "/message/" + getQueryVariable("id"),
+                        params:{
+                            pageNumber:_this.currentPage,
+                            limitNumber:10,
+                            sortRule:null,
+                            sortPropertyName:null
+                        }
                     }).then(resp => {
                         console.log("结果", resp.data)
                         this.message = resp.data.data;
@@ -243,12 +247,19 @@
                 },
 
                 view(threadNumber) {
-                    // TODO axaj查询
+
                     this.viewThreadNumbe = threadNumber;
                     this.dialogVisible = true;
+                    let _this=this;
                     axios({
                         method: "get",
                         url: "/back/message/" + this.message[threadNumber].id,
+                        params:{
+                            pageNumber:_this.back.currentPage,
+                            limitNumber:5,
+                            sortRule:null,
+                            sortPropertyName:null
+                        }
                     }).then(resp => {
                         console.log("结果", resp.data)
                         this.back.backList = resp.data.data;
@@ -257,15 +268,14 @@
                     console.log("回复总数",this.back.totalNumber)
                 },
 
-                show() {
-                    console.log(getQueryVariable("id"));
-                },
+                
                 showNewBack() {
                     console.log(this.viewThreadNumbe, this.newBack)
                     let formData = new FormData();
                     formData.append("messageId", this.message[this.viewThreadNumbe].id);
                     formData.append("content", this.newBack.backContent);
-                    formData.append("toBackId", this.newBack.toBackId);
+                    if(this.newBack.toBackId!=null) formData.append("toBackId", this.newBack.toBackId);
+                    console.log(formData);
                     let token = Cookie.get("token");
                     if (typeof (token) == 'undefined') token = "";
                     axios({
@@ -297,12 +307,20 @@
                 },
                 handleCurrentChange2(val){
                     console.log(`当前页: ${val}`);
+                    this.back.currentPage=val;
+                    this.view(this.viewThreadNumbe);
+                },
+                handleCurrentChange(val){
+                    console.log(`当前页: ${val}`);
+                    this.currentPage=val;
+                    this.getMessages();
                 }
 
             },
 
             data() {
                 return {
+                    currentPage:1,
                     back: {
                         currentPage: 1,
                         totalNumber: 2,
@@ -342,8 +360,9 @@
                         publisher: "admin",
                         publishTime: "2022-3-9",
                         title: "标题：夕阳无限好",
-                        content: "以下是帖子正文： <pre><code style=\"width:70%  \"> public boolean comparePassWord(String passWord) {\n        if (this.passWord == null) {\n            return false;\n        }\n        return this.passWord.equals(encryptPassword(passWord));\n  </code></pre> <img src=\"https://s3.bmp.ovh/imgs/2022/07/16/0c59564969d97665.png\" style=\"width: 500px \"></img>"
+                        content: "以下是帖子正文： <pre><code style=\"width:70%  \"> public boolean comparePassWord(String passWord) {\n        if (this.passWord == null) {\n            return false;\n        }\n        return this.passWord.equals(encryptPassword(passWord));\n  </code></pre> <img src=\"https://s3.bmp.ovh/imgs/2022/07/16/0c59564969d97665.png\" style=\"width: 500px \"></img>",
                         // content: "众所周知，<pre><code>&lt;html&gt;\n\n&lt;head&gt;\n  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;\n&lt;/script&gt;\n&lt;/head&gt;\n\n&lt;body&gt;\n\n  &lt;script type=&quot;text/javascript&quot;&gt;\n    xmlDoc=<a href=\"dom_loadxmldoc.asp\">loadXMLDoc</a>(&quot;books.xml&quot;);\n    document.write(&quot;xmlDoc is loaded, ready for use&quot;);\n  &lt;/script&gt;\n\n&lt;/body&gt;\n\n&lt;/html&gt;</code></pre>这个真是一个强大的功能 ",
+                        totalThread:3,
                     },
                     message: [{
                         publisher: "阿瞒",

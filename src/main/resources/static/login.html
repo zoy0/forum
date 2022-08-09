@@ -25,9 +25,6 @@
         </el-form-item>
         <el-link type="primary" href="regist.html">立即注册</el-link>
 
-        <!-- <el-form-item>
-            <el-button type="primary" @click="submitForm('form')">登录</el-button>
-        </el-form-item> -->
         <el-form-item>
             <el-button type="primary" @click="submit">登录</el-button>
         </el-form-item>
@@ -42,17 +39,6 @@
         },
 
         methods: {
-            // open() {
-            //     this.$alert('这是一段内容', '注册成功', {
-            //         confirmButtonText: '确定',
-            //         // callback: action => {
-            //         //     this.$message({
-            //         //         type: 'info',
-            //         //         message: `action: ${action}`
-            //         //     });
-            //         // }
-            //     });
-            // },
 
             submit() {
 
@@ -74,18 +60,8 @@
                         this.$message.error(resp.data.message);
                     } else {
                         document.cookie="token="+resp.data.data;
-                        // +";HttpOnly";
                         window.location.href = "index.html";
                     }
-
-                    // this.$alert(null, resp.data.message, {
-                    //     dangerouslyUseHTMLString: true,
-                    //     confirmButtonText: '确定',
-                    //     callback: action => {
-                    //         // if (resp.data.data == true)
-                    //         //     window.location.href = "login.html";
-                    //     }
-                    // });
                 })
             }
 

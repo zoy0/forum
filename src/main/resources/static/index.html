@@ -20,6 +20,9 @@
             text-color="#fff" active-text-color="#ffd04b">
             <el-menu-item index="1">推荐</el-menu-item>
             <el-menu-item index="2">视频</el-menu-item>
+
+            <!-- TODO 
+            v-if 判断token并放回用户信息 -->
             <el-submenu index="3" v-if="token!=null">
                 <template slot="title">我的</template>
                 <el-menu-item index="3-1">关注</el-menu-item>
@@ -30,7 +33,6 @@
             </el-submenu>
             <el-menu-item index="4" v-else>登录</el-menu-item>
 
-            <el-button type="primary" plain @click="debug" style="margin-left: 30%; margin-top : 10px">debug</el-button>
         </el-menu>
 
 
@@ -67,13 +69,6 @@
             @current-change="handleCurrentChange" style="margin-top: 20px;">
         </el-pagination>
 
-        <!-- <div class="block">
-            <span class="demonstration">显示总数</span>
-            <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-                :current-page.sync="currentPage1" :page-size="10" layout="total, prev, pager, next" :total="1000">
-            </el-pagination>
-        </div> -->
-
         <!-- 发布 对话框 -->
         <el-dialog title="发布帖子" :visible.sync="dialogVisible">
 
@@ -84,7 +79,6 @@
 
 
                 <el-form-item label="正文:">
-                    <!-- <el-input v-model="form.content" autocomplete="off"></el-input> -->
                     <el-input type="textarea" autosize placeholder="请输入正文" v-model="form.content" style="width: 60%;">
                     </el-input>
                 </el-form-item>
@@ -104,12 +98,10 @@
 
 
 
-
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogVisible = false">取 消</el-button>
                 <el-button type="primary" @click="submitFile">确 定</el-button>
-                <el-button type="primary" @click="debug">debug</el-button>
             </div>
         </el-dialog>
 
@@ -201,17 +193,6 @@
                             })
                         }
                     })
-
-
-
-                    // $http.post(" /posting/add ", formData, { headers: { 'Content-Type': 'multipart/form-data' } }).then(data => {
-                    //     console.log(data)
-                    // }).catch(error => {
-                    //     this.$message({
-                    //         message: "error",
-                    //         type: 'error'
-                    //     })
-                    // });
                 },
 
 
@@ -235,19 +216,6 @@
 
 
 
-
-                open() {
-                    this.$alert('这是一段内容', '注册成功', {
-                        confirmButtonText: '确定',
-                        // callback: action => {
-                        //     this.$message({
-                        //         type: 'info',
-                        //         message: `action: ${action}`
-                        //     });
-                        // }
-                    });
-                },
-
                 getPostings() {
                     let _this = this;
                     axios({
@@ -268,8 +236,6 @@
                         this.total_number = data.totalNumber;
                     });
                 }
-
-
             },
 
             data() {
@@ -307,7 +273,7 @@
                     ],
 
                     fileList: [],
-                    // file:null,
+
                     form: {
                         title: "",
                         content: "",
