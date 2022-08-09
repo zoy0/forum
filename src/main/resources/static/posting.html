@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>帖子</title>
+
+    <link rel="stylesheet" href="highlight/styles/monokai-sublime.min.css">
+    <script src="highlight/highlight.min.js"></script>
+    <script src="js/my.js"></script>
+    <script src="js/vue.js"></script>
+    <script src="element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+    <script src="js/axios-0.18.0.js"></script>
+</head>
+
+<body>
+
+
+    <div id="app">
+        <div>
+            <el-card class="box-card" style="width: 50% ; margin-bottom: 30px">
+                <h4 style="color:rgb(104, 80, 80)">{{posting.publisher}}:</h4>
+                <p style="color:rgb(150, 125, 125)">{{posting.publishTime}}</p>
+                <h2>{{posting.title}}</h2>
+                <strong v-html="posting.content"></strong>
+                <el-input type="textarea" autosize placeholder="请输入内容" v-model="addedMessage.content"
+                    style="width:40% ;">
+                </el-input>
+                <el-button type="primary" @click="submitpostingMessage()">提交</el-button>
+                <el-link type="success" @click="addblock">添加代码块</el-link>
+                <el-upload id="el-upload" ref="uploadForm" :auto-upload="false" :http-request="upLoad" action="#"
+                    :on-remove="onRemove" :before-upload="beforeUpload" list-type="picture" :on-preview="addImg"
+                    multiple>
+                    <el-button slot="trigger" size="small" type="primary">
+                        点击上传
+                    </el-button>
+                    </template>
+                </el-upload>
+            </el-card>
+        </div>
+
+        <div>
+            <el-row>
+                <el-col v-for="(item ,index) in message" :key="item.threadNumber" :offset="1">
+                    <el-card class="box-card" style="width: 40%;">
+                        <h4> {{item.publisher}}: </h4>
+                        <p>{{item.publishTime}}</p>
+                        <p>第{{item.threadNumber}}楼</p>
+                        <strong v-html="item.content"></strong><br>
+                        <el-link type="primary" @click="showTheBack(index)">回复</el-link>
+                        <el-link type="primary" v-if="item.backNumber!=0" @click="view(index)">查看全部回复</el-link>
+                        <div v-if="showBackComment==index">
+                            <el-input type="textarea" autosize placeholder="请输入内容" v-model="input" style="width:40% ;">
+                            </el-input>
+                            <el-button type="primary" @click="submitBack(index)">提交</el-button>
+                        </div>
+                    </el-card>
+
+                </el-col>
+            </el-row>
+        </div>
+
+        <!-- 分页 -->
+        <el-pagination background layout="prev, pager, next" :total="posting.totalThread" :current-page.sync="currentPage"
+        @current-change="handleCurrentChange" style="margin-top: 20px;">
+    </el-pagination>
+
+        <!-- 回复对话框 -->
+        <el-dialog title="提示" :visible.sync="dialogVisible" width="50%">
+            <el-card class="box-card" style="width: 90%; margin-bottom: 30px;">
+                <h4> {{message[this.viewThreadNumbe].publisher}}: </h4>
+                <p>{{message[this.viewThreadNumbe].publishTime}}</p>
+                <p>第{{viewThreadNumbe}}楼</p>
+                <strong v-html="message[this.viewThreadNumbe].content"></strong><br>
+            </el-card>
+
+            <div v-for="(item ,index) in back.backList" :key="item.index" :offset="1">
+                <div style="margin-bottom: 10px">
+                    <span>{{item.publisher}}</span>
+                    <span>({{item.publishTime}}):</span>
+                </div>
+                <strong>{{item.content}}</strong>
+                <br>
+                <el-link type="primary" @click="addToBack(index)" style="margin-top: 10px;">回复</el-link>
+                <el-divider></el-divider>
+            </div>
+            <el-input type="textarea" autosize placeholder="请输入内容" v-model="newBack.backContent" style="width: 61.8%;">
+            </el-input>
+            <el-button type="primary" @click="showNewBack()" style="margin-top: 10px;">提交</el-button>
+            <span slot="footer" class="dialog-footer">
+                <el-pagination small layout="prev, pager, next" :total="back.totalNumber"
+                    :current-page.sync="back.currentPage" :page-size="5" @current-change="handleCurrentChange2">
+                </el-pagination>
+                <el-button @click="dialogVisible = false">收起</el-button>
+            </span>
+        </el-dialog>
+
+
+
+    </div>
+
+
+
+    <script>
+
+
+        new Vue({
+            el: "#app",
+
+            mounted() {
+                this.getDetailedPosting();
+                this.getMessages();
+                hljs.initHighlightingOnLoad();
+            },
+
+            methods: {
+                addblock() {
+                    this.addedMessage.content = this.addedMessage.content + "<pre><code class=\"语言类型\"></code></pre>";
+                },
+
+                //例子
+                //我的上传方法并没有写任何东西，因为我的上传是通过点击提交的时候再自定义上传的
+                //之所以要写一个空方法是因为需要获取到组件的file数组
+                //如果不写这个方法  会取action里面的值来进行上传（就算action为空也会）
+                upLoad(params) {
+                },
+
+                //fileList是我定义的用于存储file数组的变量
+                //在上传前，将文件存储到fileList里面
+                beforeUpload(file) {
+                    // this.fileList.push(file);
+                    // this.file=file
+                    console.log("添加文件后", this.fileList)
+                },
+                //移除方法，将fileList里面的file去掉
+                onRemove(file) {
+                    let index = this.addedMessage.fileList.findIndex(fileItem => fileItem.uid === file.uid);
+                    this.addedMessage.fileList.splice(index, 1);
+                    console.log("移除文件后", this.fileList)
+                },
+
+                addImg(file) {
+                    this.addedMessage.content = this.addedMessage.content + "<img  src='" + file.name + "' style=\"width: 500px \"></img>";
+                    this.addedMessage.fileList.push(file.raw);
+                    console.log(file)
+                },
+
+                submitpostingMessage() {
+                    //点击提交的时候触发的方法
+                    //第一句话是触发上传组件的上传方法 这样才能触发beforeUpload（因为我们写了取消自动上传）
+                    this.$refs.uploadForm.submit()
+                    //对fileList用formData拼接
+                    let formData = new FormData();
+                    this.addedMessage.fileList.forEach((item) => {
+                        formData.append("photo", item);
+                    });
+                    // formData.append("photo",this.file)
+                    //这里设置下请求头和传递的额外参数
+
+                    formData.append("postingId", getQueryVariable("id"));
+                    formData.append("content", this.addedMessage.content);
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
+                    axios({
+                        method: "post",
+                        url: "/message/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token": token
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('留言成功', '', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    location.reload();
+                                }
+                            })
+                        }
+                    })
+                },
+
+
+                submitBack(index) {
+                    console.log(index + ":" + this.input)
+                    let formData = new FormData();
+                    formData.append("messageId", this.message[index].id);
+                    formData.append("content", this.input);
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
+                    axios({
+                        method: "post",
+                        url: "/back/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token": token
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('发布成功')
+                        }
+                    })
+                },
+
+                showTheBack(index) {
+                    this.input = "";
+                    this.showBackComment = index;
+                },
+
+                getDetailedPosting() {
+                    let _this = this;
+                    axios({
+                        method: "get",
+                        url: "/posting/detail/" + getQueryVariable("id"),
+                    }).then(resp => {
+                        console.log("结果", resp.data)
+                        this.posting = resp.data.data;
+                    });
+                },
+
+                getMessages() {
+                    let _this = this;
+                    axios({
+                        method: "get",
+                        url: "/message/" + getQueryVariable("id"),
+                        params:{
+                            pageNumber:_this.currentPage,
+                            limitNumber:10,
+                            sortRule:null,
+                            sortPropertyName:null
+                        }
+                    }).then(resp => {
+                        console.log("结果", resp.data)
+                        this.message = resp.data.data;
+                    });
+                },
+
+                view(threadNumber) {
+
+                    this.viewThreadNumbe = threadNumber;
+                    this.dialogVisible = true;
+                    let _this=this;
+                    axios({
+                        method: "get",
+                        url: "/back/message/" + this.message[threadNumber].id,
+                        params:{
+                            pageNumber:_this.back.currentPage,
+                            limitNumber:5,
+                            sortRule:null,
+                            sortPropertyName:null
+                        }
+                    }).then(resp => {
+                        console.log("结果", resp.data)
+                        this.back.backList = resp.data.data;
+                    });
+                    this.back.totalNumber=this.message[threadNumber].backNumber;
+                    console.log("回复总数",this.back.totalNumber)
+                },
+
+                
+                showNewBack() {
+                    console.log(this.viewThreadNumbe, this.newBack)
+                    let formData = new FormData();
+                    formData.append("messageId", this.message[this.viewThreadNumbe].id);
+                    formData.append("content", this.newBack.backContent);
+                    if(this.newBack.toBackId!=null) formData.append("toBackId", this.newBack.toBackId);
+                    console.log(formData);
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
+                    axios({
+                        method: "post",
+                        url: "/back/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token": token
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('发布成功', '', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    location.reload();
+                                }
+                            })
+                        }
+                    })
+                },
+                addToBack(index) {
+                    this.newBack.backContent = "回复 " + this.back.backList[index].publisher + " : ";
+                    this.newBack.toBackId = this.back.backList[index].id;
+                },
+                handleCurrentChange2(val){
+                    console.log(`当前页: ${val}`);
+                    this.back.currentPage=val;
+                    this.view(this.viewThreadNumbe);
+                },
+                handleCurrentChange(val){
+                    console.log(`当前页: ${val}`);
+                    this.currentPage=val;
+                    this.getMessages();
+                }
+
+            },
+
+            data() {
+                return {
+                    currentPage:1,
+                    back: {
+                        currentPage: 1,
+                        totalNumber: 2,
+                        pageNumber: 1,
+                        backList: [{
+                            id: 1,
+                            publisher: "zy233",
+                            publishTime: "2022-3-10",
+                            content: "万名之",
+                        },
+                        {
+                            id: 2,
+                            publisher: "admin",
+                            publishTime: "2022-3-11",
+                            content: "thanks",
+                        }],
+
+                    },
+
+                    newBack: {
+                        toBackId: null,
+                        backContent: "",
+                    },
+
+                    currentFile: null,
+                    addedMessage: {
+                        fileList: [],
+                        content: "",
+                    },
+                    input: "",
+                    showBackComment: -1,
+                    postingMessage: "",
+
+                    dialogVisible: false,
+                    viewThreadNumbe: 0,
+                    posting: {
+                        publisher: "admin",
+                        publishTime: "2022-3-9",
+                        title: "标题：夕阳无限好",
+                        content: "以下是帖子正文： <pre><code style=\"width:70%  \"> public boolean comparePassWord(String passWord) {\n        if (this.passWord == null) {\n            return false;\n        }\n        return this.passWord.equals(encryptPassword(passWord));\n  </code></pre> <img src=\"https://s3.bmp.ovh/imgs/2022/07/16/0c59564969d97665.png\" style=\"width: 500px \"></img>",
+                        // content: "众所周知，<pre><code>&lt;html&gt;\n\n&lt;head&gt;\n  &lt;script type=&quot;text/javascript&quot; src=&quot;loadxmldoc.js&quot;&gt;\n&lt;/script&gt;\n&lt;/head&gt;\n\n&lt;body&gt;\n\n  &lt;script type=&quot;text/javascript&quot;&gt;\n    xmlDoc=<a href=\"dom_loadxmldoc.asp\">loadXMLDoc</a>(&quot;books.xml&quot;);\n    document.write(&quot;xmlDoc is loaded, ready for use&quot;);\n  &lt;/script&gt;\n\n&lt;/body&gt;\n\n&lt;/html&gt;</code></pre>这个真是一个强大的功能 ",
+                        totalThread:3,
+                    },
+                    message: [{
+                        publisher: "阿瞒",
+                        publishTime: "2022-3-9",
+                        threadNumber: "1",
+                        content: "正是如此",
+                        backNumber: 0,
+
+                    },
+                    {
+                        publisher: "zy233",
+                        publishTime: "2022-3-10",
+                        threadNumber: "2",
+                        content: "补充一下,<pre> <code class=\"java\"> ResultDto login(String username, String password,boolean admin); </code> </pre>",
+                        backNumber: 1,
+
+                    },
+                    {
+                        publisher: "zy233",
+                        publishTime: "2022-3-10",
+                        threadNumber: "3",
+                        content: "还有以下几点<img src=\"https://s3.bmp.ovh/imgs/2022/07/16/7e82f0c970a591fa.png\" style=\"width: 500px \"></img>",
+                        backNumber: 2,
+
+                    },]
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

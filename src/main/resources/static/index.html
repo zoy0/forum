@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+    <script src="js/vue.js"></script>
+    <script src="element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+    <script src="js/axios-0.18.0.js"></script>
+    <script src="js/my.js"></script>
+</head>
+
+<body>
+
+    <div id="app">
+
+        <!-- 头 -->
+        <el-menu :default-active="activeIndex2" class="el-menu-demo" mode="horizontal" background-color="#545c64"
+            text-color="#fff" active-text-color="#ffd04b">
+            <el-menu-item index="1">推荐</el-menu-item>
+            <el-menu-item index="2">视频</el-menu-item>
+
+            <!-- TODO 
+            v-if 判断token并放回用户信息 -->
+            <el-submenu index="3" v-if="token!=null">
+                <template slot="title">我的</template>
+                <el-menu-item index="3-1">关注</el-menu-item>
+                <el-menu-item index="3-2">动态<i class="el-icon-message-solid">5</i></el-menu-item>
+                <el-menu-item index="3-3">贴子</el-menu-item>
+                <el-menu-item index="3-4">收藏</el-menu-item>
+                <el-menu-item index="3-5">退出登录</el-menu-item>
+            </el-submenu>
+            <el-menu-item index="4" v-else>登录</el-menu-item>
+
+        </el-menu>
+
+
+        <!-- 搜索框 -->
+        <div style="margin-top: 10px;">
+            <el-input v-model="input" placeholder="请输入内容" style="width:30%;"></el-input>
+            <el-button type="primary" icon="el-icon-search" @click="searchMethod">搜索</el-button>
+        </div>
+        <el-button type="success" plain style="margin-top: 20px; margin-bottom: 10px;" @click="dialogVisible = true">发布
+        </el-button>
+
+        <!-- 帖子循环展示 -->
+        <template>
+            <div id="card">
+                <el-row>
+                    <el-col v-for="(item) in tabledata" :key="item.id" :offset="1">
+                        <div>
+                            <el-link type="info" @click="view(item.id)">{{item.title}}</el-link><br>
+                            <span>{{item.simpleContent}}</span>
+                            <div v-if="item.fileHtmlString!=null">
+                                <div v-html="item.fileHtmlString"></div>
+                            </div>
+                        </div>
+                        <el-divider></el-divider>
+                    </el-col>
+                </el-row>
+            </div>
+        </template>
+
+
+
+        <!-- 分页 -->
+        <el-pagination background layout="prev, pager, next" :total="total_number" :current-page.sync="currentPage"
+            @current-change="handleCurrentChange" style="margin-top: 20px;">
+        </el-pagination>
+
+        <!-- 发布 对话框 -->
+        <el-dialog title="发布帖子" :visible.sync="dialogVisible">
+
+            <el-form :model="form">
+                <el-form-item label="标题:" style="width:50%" minlength="5">
+                    <el-input v-model="form.title" placeholder="请输入标题(最少5字)"></el-input>
+                </el-form-item>
+
+
+                <el-form-item label="正文:">
+                    <el-input type="textarea" autosize placeholder="请输入正文" v-model="form.content" style="width: 60%;">
+                    </el-input>
+                </el-form-item>
+
+                <el-link type="success" @click="addblock">添加代码块</el-link>
+
+
+
+                <el-upload id="el-upload" ref="uploadForm" :auto-upload="false" :http-request="upLoad" action="#"
+                    :on-remove="onRemove" :before-upload="beforeUpload" list-type="picture" :on-preview="addImg"
+                    multiple>
+                    <el-button slot="trigger" size="small" type="primary">
+                        点击上传
+                    </el-button>
+                    </template>
+                </el-upload>
+
+
+
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submitFile">确 定</el-button>
+            </div>
+        </el-dialog>
+
+    </div>
+    <script>
+        new Vue({
+
+
+
+            el: "#app",
+
+            mounted() {
+                this.getPostings();
+            },
+
+            methods: {
+
+                addblock() {
+                    this.form.content = this.form.content + "<pre><code class=\"语言类型\"></code></pre>";
+                },
+
+                //例子
+                //我的上传方法并没有写任何东西，因为我的上传是通过点击提交的时候再自定义上传的
+                //之所以要写一个空方法是因为需要获取到组件的file数组
+                //如果不写这个方法  会取action里面的值来进行上传（就算action为空也会）
+                upLoad(params) {
+                },
+
+                //fileList是我定义的用于存储file数组的变量
+                //在上传前，将文件存储到fileList里面
+                beforeUpload(file) {
+                    // this.fileList.push(file);
+                    // this.file=file
+                    console.log("添加文件后", this.fileList)
+                },
+                //移除方法，将fileList里面的file去掉
+                onRemove(file) {
+                    let index = this.fileList.findIndex(fileItem => fileItem.uid === file.uid);
+                    this.fileList.splice(index, 1);
+                    console.log("移除文件后", this.fileList)
+                },
+
+                addImg(file) {
+                    this.form.content = this.form.content + "<img  src='" + file.name + "' style=\"width: 500px \"></img>";
+                    this.fileList.push(file.raw);
+                    console.log(file)
+                },
+
+                searchMethod() {
+                    this.search = this.input;
+                    this.getPostings();
+                },
+
+                submitFile() {
+                    //点击提交的时候触发的方法
+                    //第一句话是触发上传组件的上传方法 这样才能触发beforeUpload（因为我们写了取消自动上传）
+                    this.$refs.uploadForm.submit()
+                    //对fileList用formData拼接
+                    let formData = new FormData();
+                    this.fileList.forEach((item) => {
+                        formData.append("photo", item);
+                    });
+                    // formData.append("photo",this.file)
+                    //这里设置下请求头和传递的额外参数
+
+                    formData.append("title", this.form.title);
+                    formData.append("content", this.form.content);
+                    let token = Cookie.get("token");
+                    if (typeof (token) == 'undefined') token = "";
+                    axios({
+                        method: "post",
+                        url: "/posting/add",
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                            "token": token
+                        },
+                        withCredentials: true,
+                        data: formData
+                    }).then(resp => {
+                        let data = resp.data;
+                        if (data.code != 200) {
+                            this.$message.error(data.message);
+                        } else {
+                            this.$alert('发布成功', '', {
+                                confirmButtonText: '确定',
+                                callback: action => {
+                                    location.reload();
+                                }
+                            })
+                        }
+                    })
+                },
+
+
+
+
+                handleCurrentChange() {
+                    this.getPostings();
+                    console.log(this.currentPage)
+                },
+
+                debug() {
+                    var cookie = Document.cookie;
+                    console.log(Cookie.get("token"))
+                },
+
+                // 查看帖子
+                view(id) {
+                    console.log(id);
+                    window.open('posting.html?id='+id,'_blank');
+                },
+
+
+
+                getPostings() {
+                    let _this = this;
+                    axios({
+                        method: "get",
+                        url: "/posting/list",
+                        params: {
+                            'search': _this.search,
+                            'pageNumber': _this.currentPage,
+                            'limitNumber': 10,
+                            'type': _this.type,
+                            'sortRule': _this.sortRule,
+                            'sortPropertyName': _this.sortPropertyName,
+                        }
+                    }).then(resp => {
+                        console.log("结果", resp.data)
+                        let data = resp.data.data;
+                        this.tabledata = data.list;
+                        this.total_number = data.totalNumber;
+                    });
+                }
+            },
+
+            data() {
+                return {
+
+                    currentFile: null,
+
+                    total_number: 50,
+                    currentPage: 1,
+                    input: "",
+                    search: "",
+                    sortRule: "",
+                    sortPropertyName: "",
+                    limitNumber: "",
+                    type: 0,
+
+
+                    token: null,
+                    tabledata: [
+                        {
+                            id: 1,
+                            title: "夕阳无限好",
+                            content: "众所周知，****"
+                        },
+                        {
+                            id: 2,
+                            title: "5字标题ing",
+                            content: "综上所述***"
+                        },
+                        {
+                            id: 3,
+                            title: "循环展示+++",
+                            content: "example -----"
+                        },
+                    ],
+
+                    fileList: [],
+
+                    form: {
+                        title: "",
+                        content: "",
+
+                    },
+                    dialogVisible: false,
+                    input: '',
+                    activeIndex2: '1'
+                }
+            }
+        })
+
+    </script>
+
+
+
+</body>
+
+</html>

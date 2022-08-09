@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>用户注册</title>
+    <script src="js/vue.js"></script>
+    <script src="element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+    <script src="js/axios-0.18.0.js"></script>
+    <script src="js/jsencrypt.min.js"></script>
+    <script src="js/encryptUtil.js"></script>
+</head>
+
+<body>
+
+<div id="app">
+    <el-form ref="form" :model="form" :rules="rules" class="login-box">
+        <h3 class="login-title">注册页面</h3>
+        <el-form-item label="账号" prop="name">
+            <el-input type="text" placeholder="请输入用户名" v-model="form.name"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+            <el-input type="password" placeholder="请输入密码" v-model="form.password"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+            <el-input type="text" placeholder="请输入邮箱地址" v-model="form.email"></el-input>
+        </el-form-item>
+        <el-link type="primary" href="login.html">返回登录</el-link>
+        </el-form-item> -->
+        <el-form-item>
+            <el-button type="primary" @click="submit">注册</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+
+        mounted() {
+
+        },
+
+        methods: {
+
+            submit() {
+
+                let formData = new FormData();
+                formData.append('username',this.form.name);
+                formData.append('password',encryptData(this.form.password));
+                formData.append('email',this.form.email);
+                axios({
+                    method: "post",
+                    url: "/user/regist",
+                    headers: {
+                        "Content-Type": "multipart/form-data"
+                    },
+                    withCredentials:true,
+                    data:formData
+                }).then(resp => {
+                    this.$alert(null, resp.data.message, {
+                        dangerouslyUseHTMLString: true,
+                        confirmButtonText: '确定',
+                        callback: action => {
+                            if (resp.data.data == true)
+                                window.location.href = "login.html";
+                        }
+                    });
+                })
+            }
+
+        },
+
+        data() {
+            return {
+                form: {
+                    name: '',
+                    password: '',
+                    email: ''
+                },
+                rules: {
+                    name: [{
+                        required: true,
+                        message: '请输入用户名',
+                        trigger: 'blur'
+                    }],
+                    password: [{
+                        required: true,
+                        message: '请输入密码',
+                        trigger: 'blur'
+                    }]
+                }
+            }
+        }
+    })
+
+</script>
+<style lang="scss" scoped>
+    .login-box {
+        width: 350px;
+        margin: 120px auto;
+        border: 1px solid #DCDFE6;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 30px #DCDFE6;
+    }
+
+    .login-title {
+        text-align: center;
+    }
+
+    .el-button {
+        margin-top: 10px;
+        width: 60%;
+        margin-left: 60px;
+    }
+</style>
+
+</body>
+
+</html>
